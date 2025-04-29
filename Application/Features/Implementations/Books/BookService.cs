@@ -22,9 +22,13 @@ namespace Application.Features.Implementations.Books
         public void Add(Book book)
         {
             //_repository.Any<Book>(Book => Book.Id == book.Id);
-           var last= _repository.GetLastRecord<Book>();
+           //var last= _repository.GetLastRecord<Book>();
             _repository.Add(book);
             _repository.Save();
         }
+
+
+
+
     }
 }
