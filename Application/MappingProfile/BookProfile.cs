@@ -1,0 +1,24 @@
+﻿using Application.Dtos.Commons;
+using AutoMapper;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Application.MappingProfile
+{
+    internal class BookProfile : Profile
+    {
+        public BookProfile()
+        {
+            //CreateMap<HomeSlider, GetHomeSliderDto>()
+            //  .ForMember(dest => dest.BaseInfo, opt => opt.MapFrom(src => new BaseDto
+            //  {
+            //      InsertTime = src.InsertTime.ConvertToShamsi(),
+            //      UpdateTime = src.UpdateTime.HasValue ? src.UpdateTime.Value.ConvertToShamsi() : null,
+            //      IsActive = src.IsActive,
+            //  })).ReverseMap();
+        }
+    }
+}
