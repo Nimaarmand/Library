@@ -25,6 +25,9 @@ namespace Persistence.Contexts
 
         public DbSet<Book> Books { get; set; }
 
+        public DbSet<BookCategories>  bookCategories { get; set; }
+        
+
 
 
 

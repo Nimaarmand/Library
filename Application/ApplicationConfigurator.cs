@@ -18,6 +18,7 @@ namespace Application
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
             services.AddScoped<IBookService, BookService>();
+            services.AddScoped<IBookService, BookService>();
         }
     }
 }

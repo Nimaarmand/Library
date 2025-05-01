@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Application.Features.Definitions.Books
 {
+    /// <summary>
+    /// سرویس مدیریت کتاب ها 
+    /// </summary>
     public interface IBookService
     {
     }

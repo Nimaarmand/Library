@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Entities.Books;
 
 namespace Application.Features.Definitions.Contexts
 {
@@ -14,7 +15,6 @@ namespace Application.Features.Definitions.Contexts
         DbContext Context { get; }
         DatabaseFacade Database { get; }
         DbSet<TEntity> Set<TEntity>() where TEntity : class;
-
         int SaveChanges();
         int SaveChanges(bool acceptAllChangesOnSuccess);
         Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default);

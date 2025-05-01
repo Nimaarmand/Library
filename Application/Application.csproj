@@ -24,7 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Dtos\Books\" />
     <Folder Include="Exceptions\" />
     <Folder Include="ExternalServices\Definitions\" />
     <Folder Include="Features\Definitions\Identity\" />
