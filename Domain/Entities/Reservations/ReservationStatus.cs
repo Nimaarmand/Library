@@ -1,6 +1,6 @@
 ﻿namespace Domain.Entities.Reservations
 {
-    public class ReservationStatus 
+    public class DeliveryStatus 
     {
         public long Id { get; set; }
         public DateTime StatusDate { get; set; }

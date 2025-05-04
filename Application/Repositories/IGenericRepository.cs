@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Storage;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -154,6 +155,8 @@ namespace Application.Repositories
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task SaveChangesAsync(CancellationToken cancellationToken = default);
+        Task<IDbContextTransaction> BeginTransactionAsync();
+
 
     }
 }

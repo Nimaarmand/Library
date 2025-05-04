@@ -1,13 +1,16 @@
 ﻿using Application.Constants.Commons;
 using Application.Dtos.Books;
+using Application.Exceptions.ValidationExceptions;
 using Application.Features.Definitions.Books;
 using Application.Features.Definitions.Contexts;
 using Application.Repositories;
 using AutoMapper;
 using Domain.Entities.Books;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,12 +23,12 @@ namespace Application.Features.Implementations.Books
     {
         private readonly IGenericRepository _repository;
         private readonly IMapper _mapper;
-        private readonly IApplicationDbContext _context;
-        public BookCategoriesService(IGenericRepository repository, IMapper mapper, IApplicationDbContext context)
+        
+        public BookCategoriesService(IGenericRepository repository, IMapper mapper)
         {
             _repository = repository;
             _mapper = mapper;
-            _context = context;
+          
         }
         public async Task<string> AddAsync(BookCategoriesDto categories)
         {
@@ -77,22 +80,27 @@ namespace Application.Features.Implementations.Books
                 return Messages.Error($"خطایی در فرآیند به‌روزرسانی رخ داد: {ex.Message}");
             }
         }
-        public List<BookCategoriesDto> GetBookCategories()
+        public async Task<List<BookCategoriesDto>> GetBookCategoriesWithChildrenCountAsync()
         {
-            // واکشی لیست دسته‌بندی‌ها از پایگاه داده
-            var bookCategories = _context.bookCategories.ToList();
+           
+            var bookCategories = await _repository.GetAll<BookCategories>(
+                includeProperties: new Expression<Func<BookCategories, object>>[]
+                {
+                  category => category.Book
+                });
 
-            // تبدیل مدل به DTO و محاسبه تعداد فرزندان هر والد
+           
             var bookCategoriesDto = bookCategories
                 .Select(category => new BookCategoriesDto
                 {
                     Name = category.Name,
                     ChildName = category.ChildName,
                     Description = category.Description,
-                    ChildNumber = bookCategories.Count(c => c.ChildName == category.Name) // محاسبه تعداد فرزندان مرتبط
+                    ChildNumber = bookCategories.Count(c => c.ChildName == category.Name)
                 })
                 .ToList();
 
+        
             return bookCategoriesDto;
         }
         public async Task<string> AddAChildsync(BookCategoriesDto categoryDto, int parentId)
@@ -128,18 +136,19 @@ namespace Application.Features.Implementations.Books
                 return Messages.Success("والد جدید با موفقیت ثبت شد.");
             }
         }
-        //نمایش لیست زیر مجموعه ها 
-        public List<BookCategoriesDto> ChildBookCategories(long parentId)
+        
+        public async Task<List<BookCategoriesDto>> ChildBookCategories(long parentId)
         {
             if (parentId <= 0)
             {
                 throw new ArgumentException("دسته بندی نمی تواند خالی باشد.");
             }
 
-            // واکشی فرزندهای مرتبط با آیدی والد
-            var children = _context.bookCategories
-                .Where(c => c.ChildName != null && c.Id == parentId)
-                .ToList();
+           
+            var children = await _repository.GetAll<BookCategories>(predicate: search => search.ChildName != null && search.Id == parentId,
+                orderBy: oreder => oreder.Id, false);
+                
+             
 
             if (!children.Any())
             {
@@ -156,18 +165,18 @@ namespace Application.Features.Implementations.Books
 
             return childrenDto;
         }
-        //لیست کتاب های این دسته بندی
-        public List<BookCategoriesDto> GetBooks(long categoryId)
+    
+        public async Task<List<BookCategoriesDto>> GetBooks(long categoryId)
         {
             if (categoryId <= 0)
             {
-                throw new ArgumentException("آیدی دسته‌بندی نمی‌تواند خالی یا کمتر از صفر باشد.");
+                
+                throw new MyArgumentNullException(ErrorType.IdNotFound);
             }
 
-            // واکشی کتاب‌هایی که آیدی دسته‌بندی مورد نظر را دارند
-            var books = _context.Books
-                .Where(b => b.BookCategoriesId == categoryId)
-                .ToList();
+
+            var books = await _repository.GetAll<Book>(predicate: serach => serach.BookCategoriesId == categoryId, orderBy: oreder => oreder.Id, false);
+                
 
             if (!books.Any())
             {
@@ -184,6 +193,7 @@ namespace Application.Features.Implementations.Books
 
             return booksDto;
         }
+
         public async Task<string> RemoveAsync(long bookId)
         {
 

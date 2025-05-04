@@ -1,4 +1,5 @@
 ﻿using Domain.Entities.Commons;
+using Domain.Entities.Reservations;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -50,7 +51,7 @@ namespace Domain.Entities.Books
         /// <summary>
         /// مشخص می‌کند که آیا کتاب در دسترس است یا خیر
         /// </summary>
-        public bool IsAvailable { get; set; }
+        public bool IsAvailable { get; set; }=true;
 
         /// <summary>
         /// تاریخ انتشار کتاب
@@ -66,5 +67,7 @@ namespace Domain.Entities.Books
         /// شی مرتبط به دسته‌بندی کتاب‌ها
         /// </summary>
         public BookCategories BookCategories { get; set; }
+        public long ReservationId { get; set; }
+        public ICollection<Reservation> reservations { get; set; }
     }
 }

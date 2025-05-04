@@ -13,8 +13,8 @@ namespace Application.Features.Definitions.Books
     /// </summary>
     public interface IBookCategories
     {
-        List<BookCategoriesDto> GetBookCategories();
-        List<BookCategoriesDto> ChildBookCategories(long Id);
-        List<BookCategoriesDto> GetBooks(long Id);
+       
+       
+        
     }
 }

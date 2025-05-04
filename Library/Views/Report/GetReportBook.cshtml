@@ -1,0 +1,27 @@
+﻿@model IEnumerable<Application.Dtos.Books.BookDto>
+
+@{
+    ViewData["Title"] = "GetReportBook";
+}
+
+@{
+    ViewData["Title"] = "Book Report";
+}
+
+<h2>Book Report</h2>
+
+<div id="reportContainer"></div>
+
+<script type="text/javascript">
+    var report = new Stimulsoft.Report.StiReport();
+    report.load("/reports/BookReport.mrt");  // مسیر فایل گزارش
+
+    // ارسال داده‌ها به گزارش
+    var data = @Html.Raw(Json.Serialize(Model)); // داده‌های کتاب که از کنترلر آمده است
+    report.regData("Books", data);
+
+    // نمایش گزارش در صفحه
+    var viewer = new Stimulsoft.Viewer.StiViewer(null, "StiViewer", false);
+    viewer.report = report;
+    viewer.renderHtml("reportContainer");
+</script>

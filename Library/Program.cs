@@ -1,11 +1,19 @@
 ﻿
-
+using Application.Features.Definitions.Books;
+using Application.Features.Implementations.Books;
+using Application.Repositories;
+using Hangfire;
+using Microsoft.Build.Framework;
+using Persistence.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddScoped<IReservationBookService, ReservationBookService>();
+builder.Services.AddScoped<IGenericRepository, GenericRepository>();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
+
+app.Lifetime.ApplicationStarted.Register(StartRecurringJobOptions);
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -17,13 +25,21 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
-app.UseAuthorization();
+app.UseHangfireDashboard("/hangfire");
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
+void StartRecurringJobOptions()
+{
+    RecurringJob.AddOrUpdate<ReservationBookService>(
+     "AutoReleaseReservations",
+     x => x.AutoReleaseExpiredReservationsAsync(),
+     Cron.Daily,
+     new RecurringJobOptions { TimeZone = TimeZoneInfo.Utc });
+
+}

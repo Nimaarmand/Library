@@ -6,10 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Domain.Entities.Books;
-using Domain.Entity.Users;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.Extensions.Logging;
-using static Dapper.SqlMapper;
 using System.Text.RegularExpressions;
 using Persistence.Seeds.ApplicationSeed;
 using Persistence.Configurations.ApplicationConfigurations;
@@ -25,7 +21,7 @@ namespace Persistence.Contexts
 
         public DbSet<Book> Books { get; set; }
 
-        public DbSet<BookCategories>  bookCategories { get; set; }
+        public DbSet<BookCategories> BookCategories { get; set; }
         
 
 

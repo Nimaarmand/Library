@@ -1,6 +1,7 @@
 ﻿using Application.Features.Definitions.Contexts;
 using Application.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -221,7 +222,7 @@ namespace Persistence.Repositories
                               .ToListAsync(cancellationToken);
         }
 
-        public async Task<TEntity> Add<TEntity>(TEntity entity) where TEntity : class
+        public async Task<TEntity> AddAsync<TEntity>(TEntity entity) where TEntity : class
         {
             await _context.Set<TEntity>().AddAsync(entity);
             return entity;
@@ -232,25 +233,29 @@ namespace Persistence.Repositories
             return entities;
         }
 
-        public void Remove<TEntity>(TEntity entity) where TEntity : class
+        public async Task RemoveAsync<TEntity>(TEntity entity) where TEntity : class
         {
             _context.Set<TEntity>().Remove(entity);
         }
+
+        
+
         public void RemoveRange<TEntity>(IEnumerable<TEntity> entities) where TEntity : class
         {
             _context.Set<TEntity>().RemoveRange(entities);
         }
 
-        public void Update<TEntity>(TEntity entity) where TEntity : class
+        public async Task UpdateAsync<TEntity>(TEntity entity) where TEntity : class
         {
             _context.Entry(entity).State = EntityState.Modified;
         }
+     
         public void UpdateRange<TEntity>(IEnumerable<TEntity> entities) where TEntity : class
         {
             _context.Set<TEntity>().UpdateRange(entities);
         }
 
-        public async Task Save(CancellationToken cancellationToken = default)
+        public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             using (var transaction = await _context.Database.BeginTransactionAsync(cancellationToken))
             {
@@ -265,7 +270,12 @@ namespace Persistence.Repositories
                     throw;
                 }
             }
+        }      
+        public async Task<IDbContextTransaction> BeginTransactionAsync()
+        {
+            return await _context.Database.BeginTransactionAsync();
         }
 
     }
 }
+

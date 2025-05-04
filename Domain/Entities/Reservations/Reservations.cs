@@ -8,13 +8,16 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities.Reservations
 {
-    public class Reservation:BaseEntity
+    public class Reservation: BaseEntity
     {
-        public DateTime DeliveryDate { get; set; }
+        public DateTime ReservationDate { get; set; }
+        public DateTime ExpirationDate { get; set; }    
         public string UserId { get; set; }
         public long BookId { get; set; }
-        public Book Book { get; set; }
-        public ICollection<ReservationStatus> ReservationStatus { get; set; } = new List<ReservationStatus>();
-
+         public Book Book { get; set; }  
     }
+
+  
+
+    
 }

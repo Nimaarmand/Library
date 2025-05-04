@@ -43,7 +43,17 @@ namespace Application.Constants.Commons
                 return $"اطلاعات: {message}";
             }
         }
-
+        public static string Repetitive(string? message = null)
+        {
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                return "اطلاعات تکراری است.";
+            }
+            else
+            {
+                return $" {message} بررسی انجام شد.";
+            }
+        }
         public static string Warning(string? message = null)
         {
             if (string.IsNullOrWhiteSpace(message))

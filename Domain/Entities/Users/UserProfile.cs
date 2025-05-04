@@ -1,6 +1,6 @@
 ﻿using Domain.Entities.Commons;
 
-namespace Domain.Entity.Users
+namespace Domain.Entities.Users
 {
     public class UserProfile : BaseEntityNotId
     {
