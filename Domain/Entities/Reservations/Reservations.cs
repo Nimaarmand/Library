@@ -8,17 +8,22 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities.Reservations
 {
-    public class Reservation: BaseEntity
+    public class Reservation : BaseEntity
     {
         public DateTime ReservationDate { get; set; }
-        public DateTime ExpirationDate { get; set; }    
+        public DateTime ExpirationDate { get; set; }
+
+        // ارتباط مستقیم با کاربر
         public string UserId { get; set; }
+
+        // ارتباط مستقیم با کتاب
         public long BookId { get; set; }
-         public Book Book { get; set; }
-        public ICollection<DeliveryStatus> deliveryStatuses { get; set; } = new List<DeliveryStatus>();
+        public virtual Book Book { get; set; }
+
+        // ارتباط مستقیم با وضعیت تحویل
+        public virtual ICollection<DeliveryStatus> DeliveryStatuses { get; set; } = new List<DeliveryStatus>();
     }
 
-  
 
-    
+
 }

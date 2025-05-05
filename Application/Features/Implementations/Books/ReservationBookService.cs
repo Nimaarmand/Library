@@ -66,8 +66,8 @@ namespace Application.Features.Implementations.Books
             reservation.ExpirationDate = DateTime.Now.AddDays(3);
 
 
-            book.reservations ??= new List<Reservation>();
-            book.reservations.Add(reservation);
+            book.Reservations ??= new List<Reservation>();
+            book.Reservations.Add(reservation);
             book.IsAvailable = false;
 
             await _repository.UpdateAsync<Book>(book);
