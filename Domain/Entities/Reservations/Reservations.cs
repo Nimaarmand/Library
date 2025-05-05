@@ -14,7 +14,8 @@ namespace Domain.Entities.Reservations
         public DateTime ExpirationDate { get; set; }    
         public string UserId { get; set; }
         public long BookId { get; set; }
-         public Book Book { get; set; }  
+         public Book Book { get; set; }
+        public ICollection<DeliveryStatus> deliveryStatuses { get; set; } = new List<DeliveryStatus>();
     }
 
   

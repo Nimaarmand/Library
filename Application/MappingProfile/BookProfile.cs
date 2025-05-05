@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Application.MappingProfile
 {
-    internal class BookProfile : Profile
+    public class BookProfile : Profile
     {
         public BookProfile()
         {

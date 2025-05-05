@@ -13,10 +13,7 @@ namespace Application.Dtos.Books
         public ReservationStatusDto ReservationStatusDto { get; set; }
         public string UserId { get; set; }
         public long BookId { get; set; }
-        public void ChangeReservationStatus(ReservationStatus status)
-        {
-            ReservationStatusDto = status;
-        }
+       
     }
     public enum ReservationStatusDto
     {

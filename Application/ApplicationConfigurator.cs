@@ -1,6 +1,7 @@
 ﻿using Application.Features.Definitions.Books;
+using Application.Features.Definitions.Contexts;
 using Application.Features.Implementations.Books;
-using Application.Features.Implementations.HangFire;
+using Application.MappingProfile;
 using Hangfire;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,25 +21,17 @@ namespace Application
     {
         public static void ConfigureApplicationServices(this IServiceCollection services, IConfiguration configuration)
         {
-           
-            // اضافه کردن AutoMapper
-            services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
+            
 
             // اضافه کردن MediatR
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
             services.AddScoped<IBookService, BookService>();
-            services.AddScoped<IReservationBookService, ReservationBookService>();
+            
+
+
            
-
-            // اضافه کردن Hangfire
-            services.AddHangfire(config => config
-                .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
-                .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings()
-                .UseSqlServerStorage(configuration.GetConnectionString("Library")));
-
-            services.AddHangfireServer();
 
            
         }
