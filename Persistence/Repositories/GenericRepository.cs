@@ -2,12 +2,7 @@
 using Application.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Persistence.Repositories
 {
@@ -238,7 +233,7 @@ namespace Persistence.Repositories
             _context.Set<TEntity>().Remove(entity);
         }
 
-        
+
 
         public void RemoveRange<TEntity>(IEnumerable<TEntity> entities) where TEntity : class
         {
@@ -249,7 +244,7 @@ namespace Persistence.Repositories
         {
             _context.Entry(entity).State = EntityState.Modified;
         }
-     
+
         public void UpdateRange<TEntity>(IEnumerable<TEntity> entities) where TEntity : class
         {
             _context.Set<TEntity>().UpdateRange(entities);
@@ -270,7 +265,7 @@ namespace Persistence.Repositories
                     throw;
                 }
             }
-        }      
+        }
         public async Task<IDbContextTransaction> BeginTransactionAsync()
         {
             return await _context.Database.BeginTransactionAsync();

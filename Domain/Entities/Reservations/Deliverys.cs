@@ -2,7 +2,7 @@
 
 namespace Domain.Entities.Reservations
 {
-    public class Delivery 
+    public class Deliverys
     {
         public long Id { get; set; }
         public string UserId { get; set; }

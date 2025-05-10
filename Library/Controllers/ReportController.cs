@@ -1,8 +1,5 @@
-﻿using Application.Features.Definitions.Books;
-using Application.Features.Implementations.Books;
-using Microsoft.AspNetCore.Http;
+﻿using Application.Features.Implementations.Books;
 using Microsoft.AspNetCore.Mvc;
-using Stimulsoft.Report.Mvc;
 using Stimulsoft.Report;
 
 namespace Library.Controllers
@@ -19,7 +16,7 @@ namespace Library.Controllers
         {
             return View();
         }
-        public async Task<IActionResult> ShowReportBok ()
+        public async Task<IActionResult> ShowReportBok()
         {
             var books = await _bookService.GetAllBooksAsync();
             return View(books);

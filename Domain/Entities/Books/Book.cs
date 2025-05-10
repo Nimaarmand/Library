@@ -1,17 +1,9 @@
 ﻿using Domain.Entities.Commons;
 using Domain.Entities.Reservations;
-using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace Domain.Entities.Books
 {
-   
+
 
     public class Book : BaseEntity
     {
@@ -32,12 +24,12 @@ namespace Domain.Entities.Books
         /// <summary>
         /// ارتباط با کتاب های تحویل داده شده
         /// </summary>
-        public virtual ICollection<Delivery> Deliveries { get; set; } = new List<Delivery>();
+        public virtual ICollection<Deliverys> Deliveries { get; set; } = new List<Deliverys>();
     }
 
 }
 
-   
 
-    
+
+
 

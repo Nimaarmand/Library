@@ -3,17 +3,12 @@ using Application.Dtos.Delivery;
 using Application.Features.Definitions.Delivery;
 using Application.Repositories;
 using AutoMapper;
-using Domain.Entities.Reservations;
 using Domain.Entities.Books;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Domain.Entities.Reservations;
 
 namespace Application.Features.Implementations.Deliverys
 {
-    public class DeliveryService: IDeliveryService
+    public class DeliveryService : IDeliveryService
     {
         private readonly IGenericRepository _repository;
         private readonly IMapper _mapper;
@@ -40,7 +35,7 @@ namespace Application.Features.Implementations.Deliverys
                 }
 
                 // ثبت تحویل جدید
-                var delivery = _mapper.Map<Delivery>(deliveryDto);
+                var delivery = _mapper.Map<Domain.Entities.Reservations.Deliverys>(deliveryDto);
                 delivery.DeliveryTime = DateTime.Now;
 
                 await _repository.AddAsync(delivery);
@@ -110,7 +105,7 @@ namespace Application.Features.Implementations.Deliverys
                 }
 
                 // ثبت تحویل کتاب برای کاربر
-                var delivery = new Delivery
+                var delivery = new Domain.Entities.Reservations.Deliverys
                 {
                     UserId = reservation.UserId,
                     BookId = reservation.BookId,
@@ -145,6 +140,6 @@ namespace Application.Features.Implementations.Deliverys
             return Messages.Error("شناسه رزرو نامعتبر است.");
         }
 
-       
+
     }
 }

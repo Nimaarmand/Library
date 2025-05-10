@@ -1,10 +1,5 @@
 ﻿using Application.Dtos.Books;
 using Domain.Entities.Books;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Features.Definitions.Books
 {
@@ -13,8 +8,11 @@ namespace Application.Features.Definitions.Books
     /// </summary>
     public interface IBookCategories
     {
-       
-       
-        
+
+
+        Task<string> AddAsync(BookCategoriesDto  categoriesDto);
+        public Task<List<BookCategoriesDto>> GetAllCategoriesAsync( );
+        Task<string> UpdateAsync(BookCategoriesDto  categoriesDto);
+        Task<string> RemoveAsync(long bookId);
     }
 }

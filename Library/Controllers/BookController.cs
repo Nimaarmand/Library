@@ -1,17 +1,15 @@
 ﻿using Application.Dtos.Books;
 using Application.Features.Definitions.Books;
-using Application.Features.Implementations.Books;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Library.Controllers
 {
     public class BookController : Controller
     {
-        private readonly BookService _BookService;
-        public BookController(BookService bookService)
+        private readonly IBookService _bookService;
+        public BookController(IBookService bookService)
         {
-            _BookService = bookService;
+            _bookService = bookService;
         }
         // GET: BookController
         public IActionResult Booklist()
@@ -25,20 +23,20 @@ namespace Library.Controllers
             return View();
         }
 
-        
+
         public IActionResult Create()
         {
             return View();
         }
 
-        
-        [HttpPost]     
-        public IActionResult Create(BookDto bookDto)
+
+        [HttpPost]
+        public async Task<IActionResult> Create(BookDto bookDto)
         {
             try
             {
-                _BookService.AddAsync(bookDto);
-                return RedirectToAction(nameof(Index));
+                var result = await _bookService.AddAsync(bookDto);
+                return Json(new { success = true, message = result });
             }
             catch
             {
@@ -49,7 +47,7 @@ namespace Library.Controllers
         // GET: BookController/Edit/5
         public IActionResult Edit(int Id)
         {
-            
+
             return View();
         }
 

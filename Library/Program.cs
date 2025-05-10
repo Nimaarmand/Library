@@ -4,18 +4,27 @@ using Application.Features.Definitions.Contexts;
 using Application.Features.Implementations.Books;
 using Application.MappingProfile;
 using Application.Repositories;
+using Domain.Entities.Books;
 using Hangfire;
-using Microsoft.Build.Framework;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Contexts;
 using Persistence.Repositories;
-using System.Configuration;
-using static Stimulsoft.Report.StiOptions;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IReservationBookService, ReservationBookService>();
 builder.Services.AddScoped<IGenericRepository, GenericRepository>();
 builder.Services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
+builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IBookCategories, BookCategoriesService>();
+
+
+
+
+//builder.Services.ConfigurePersistenceServices(builder.Configuration, builder.Environment);
+//builder.Services.ConfigureInfrastractureServices(builder.Configuration);
+//builder.Services.ConfigureApplicationServices();
+//builder.Services.ConfigureIdentityServices(builder.Configuration, builder.Environment);
+
 // اضافه کردن AutoMapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddAutoMapper(typeof(BookProfile));

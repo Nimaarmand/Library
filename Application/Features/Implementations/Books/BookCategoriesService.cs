@@ -3,16 +3,14 @@ using Application.Dtos.Books;
 using Application.Exceptions.ValidationExceptions;
 using Application.Features.Definitions.Books;
 using Application.Features.Definitions.Contexts;
+using Application.MappingProfile;
 using Application.Repositories;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Domain.Entities.Books;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace Application.Features.Implementations.Books
 {
@@ -21,203 +19,123 @@ namespace Application.Features.Implementations.Books
     /// </summary>
     public class BookCategoriesService : IBookCategories
     {
-        private readonly IGenericRepository _repository;
+        private readonly IApplicationDbContext _Context;
         private readonly IMapper _mapper;
-        
-        public BookCategoriesService(IGenericRepository repository, IMapper mapper)
+
+        public BookCategoriesService(IApplicationDbContext context, IMapper mapper)
         {
-            _repository = repository;
+            _Context = context;
             _mapper = mapper;
-          
         }
-        public async Task<string> AddAsync(BookCategoriesDto categories)
+
+        // 📌 ثبت دسته‌بندی جدید
+        public async Task<string> AddAsync(BookCategoriesDto categoriesDto)
         {
-            if (categories == null)
-            {
-                throw new ArgumentNullException(nameof(categories), "دسته‌بندی نمی‌تواند خالی باشد.");
-            }
+            if (categoriesDto == null)
+                return Messages.Error("دسته‌بندی نمی‌تواند خالی باشد.");
 
-            // مپ کردن DTO به مدل اصلی
-            var bookCategory = _mapper.Map<BookCategories>(categories);
+            var bookCategory = _mapper.Map<BookCategories>(categoriesDto);
 
-            // افزودن به دیتابیس
-            await _repository.AddAsync(bookCategory);
-            await _repository.SaveChangesAsync();
+            await _Context.BookCategories.AddAsync(bookCategory);
+            await _Context.SaveChangesAsync();
 
-            // پیام موفقیت
-            return Messages.Success("دسته‌بندی با موفقیت اضافه شد.");
+            return Messages.Success("✅ دسته‌بندی با موفقیت ثبت شد.");
         }
-        public async Task<string> UpdateAsync(BookCategoriesDto categories)
+
+        // 📌 دریافت تمام دسته‌بندی‌ها
+        public async Task<List<BookCategoriesDto>> GetAllCategoriesAsync()
         {
-           
-            if (categories == null)
-            {
-                throw new ArgumentNullException(nameof(categories), "دسته بندی یافت نشد");
-            }
-
-            
-            var entity = await _repository.Find<BookCategories>(c => c.Id == categories.Id);
-            if (entity == null)
-            {
-                return Messages.Error("دسته بندی با این شناسه یافت نشد");
-            }
-
-            try
-            {
-               
-                _mapper.Map(categories, entity);
-
-              
-                await _repository.UpdateAsync(entity);
-                await _repository.SaveChangesAsync();
-
-                
-                return Messages.Success("دسته بندی با موفقیت به روز رسانی شد");
-            }
-            catch (Exception ex)
-            {
-               
-                return Messages.Error($"خطایی در فرآیند به‌روزرسانی رخ داد: {ex.Message}");
-            }
+            var categories = await _Context.BookCategories.ToListAsync();
+            return _mapper.Map<List<BookCategoriesDto>>(categories);
         }
+
+        // 📌 به‌روزرسانی دسته‌بندی
+        public async Task<string> UpdateAsync(BookCategoriesDto categoriesDto)
+        {
+            if (categoriesDto == null)
+                throw new ArgumentNullException(nameof(categoriesDto), "BookCategoriesDto نمی‌تواند null باشد.");
+
+            var existingCategory = await _Context.BookCategories.FirstOrDefaultAsync(c => c.Id == categoriesDto.Id);
+            if (existingCategory == null)
+                return Messages.Error($"دسته‌بندی با شناسه {categoriesDto.Id} یافت نشد.");
+
+            _mapper.Map(categoriesDto, existingCategory);
+            _Context.BookCategories.Update(existingCategory);
+            await _Context.SaveChangesAsync();
+
+            return Messages.Success("✅ دسته‌بندی با موفقیت به‌روزرسانی شد.");
+        }
+
+        // 📌 حذف دسته‌بندی
+        public async Task<string> RemoveAsync(long categoryId)
+        {
+            var existingCategory = await _Context.BookCategories.FirstOrDefaultAsync(c => c.Id == categoryId);
+            if (existingCategory == null)
+                return Messages.Error($"دسته‌بندی با شناسه {categoryId} یافت نشد.");
+
+            _Context.BookCategories.Remove(existingCategory);
+            await _Context.SaveChangesAsync();
+
+            return Messages.Success("✅ دسته‌بندی با موفقیت حذف شد.");
+        }
+
+        // 📌 دریافت تعداد زیرمجموعه‌های هر دسته‌بندی
         public async Task<List<BookCategoriesDto>> GetBookCategoriesWithChildrenCountAsync()
         {
-           
-            var bookCategories = await _repository.GetAll<BookCategories>(
-                includeProperties: new Expression<Func<BookCategories, object>>[]
-                {
-                  category => category.Book
-                });
-
-           
-            var bookCategoriesDto = bookCategories
-                .Select(category => new BookCategoriesDto
-                {
-                    Name = category.Name,
-                    ChildName = category.ChildName,
-                    Description = category.Description,
-                    ChildNumber = bookCategories.Count(c => c.ChildName == category.Name)
-                })
-                .ToList();
-
-        
-            return bookCategoriesDto;
+            var bookCategories = await _Context.BookCategories.Include(c => c.Book).ToListAsync();
+            return bookCategories.Select(category => new BookCategoriesDto
+            {
+                Id = category.Id,
+                Name = category.Name,
+                Description = category.Description,
+                ChildNumber = category.Book.Count
+            }).ToList();
         }
-        public async Task<string> AddAChildsync(BookCategoriesDto categoryDto, int parentId)
+
+        // 📌 اضافه کردن زیرمجموعه به دسته‌بندی اصلی
+        public async Task<string> AddAChildAsync(BookCategoriesDto categoryDto, long parentId)
         {
             if (categoryDto == null)
-            {
-                throw new ArgumentNullException(nameof(categoryDto), "دسته‌بندی نمی‌تواند خالی باشد.");
-            }
+                return Messages.Error("دسته‌بندی نمی‌تواند خالی باشد.");
 
-            // بررسی موجود بودن آیدی والد
-            var parentCategory = await _repository.Find<BookCategories>(c => c.Id == parentId);
+            var parentCategory = await _Context.BookCategories.FindAsync(parentId);
+            if (parentCategory == null)
+                return Messages.Error($"دسته‌بندی والد با شناسه {parentId} یافت نشد.");
 
-            if (parentCategory != null)
-            {
-                // اگر والد موجود باشد، فرزند ثبت شود
-                var newChildCategory = _mapper.Map<BookCategories>(categoryDto);
-                newChildCategory.ChildName = parentCategory.Name; // تنظیم ارتباط با والد
+            var newChildCategory = _mapper.Map<BookCategories>(categoryDto);
+            newChildCategory.Id = parentId; // تنظیم والد
 
-                await _repository.AddAsync(newChildCategory);
-                await _repository.SaveChangesAsync();
+            await _Context.BookCategories.AddAsync(newChildCategory);
+            await _Context.SaveChangesAsync();
 
-                return Messages.Success("فرزند با موفقیت ثبت شد.");
-            }
-            else
-            {
-                // اگر والد موجود نباشد، والد جدید ثبت شود
-                var newParentCategory = _mapper.Map<BookCategories>(categoryDto);
-                newParentCategory.Id = parentId; // تنظیم آیدی والد
-
-                await _repository.AddAsync(newParentCategory);
-                await _repository.SaveChangesAsync();
-
-                return Messages.Success("والد جدید با موفقیت ثبت شد.");
-            }
+            return Messages.Success("✅ زیرمجموعه با موفقیت ثبت شد.");
         }
-        
-        public async Task<List<BookCategoriesDto>> ChildBookCategories(long parentId)
+
+        // 📌 دریافت زیرمجموعه‌های یک دسته‌بندی
+        public async Task<List<BookCategoriesDto>> GetChildBookCategories(long parentId)
         {
-            if (parentId <= 0)
+            var children = await _Context.BookCategories.Where(c => c.Id == parentId).ToListAsync();
+            return children.Select(child => new BookCategoriesDto
             {
-                throw new ArgumentException("دسته بندی نمی تواند خالی باشد.");
-            }
-
-           
-            var children = await _repository.GetAll<BookCategories>(predicate: search => search.ChildName != null && search.Id == parentId,
-                orderBy: oreder => oreder.Id, false);
-                
-             
-
-            if (!children.Any())
-            {
-                throw new Exception("زیر مجموعه برای این دسته بندی پیدا نشد.");
-            }
-
-            // مپ کردن مدل به DTO
-            var childrenDto = children.Select(child => new BookCategoriesDto
-            {
+                Id = child.Id,
                 Name = child.Name,
-                ChildName = child.ChildName,
                 Description = child.Description
             }).ToList();
-
-            return childrenDto;
         }
-    
+
+        // 📌 دریافت لیست کتاب‌های مرتبط با یک دسته‌بندی
         public async Task<List<BookCategoriesDto>> GetBooks(long categoryId)
         {
-            if (categoryId <= 0)
+            var books = await _Context.Books.Where(b => b.BookCategoriesId == categoryId).ToListAsync();
+            return books.Select(book => new BookCategoriesDto
             {
-                
-                throw new MyArgumentNullException(ErrorType.IdNotFound);
-            }
-
-
-            var books = await _repository.GetAll<Book>(predicate: serach => serach.BookCategoriesId == categoryId, orderBy: oreder => oreder.Id, false);
-                
-
-            if (!books.Any())
-            {
-                throw new Exception("کتابی برای این دسته‌بندی یافت نشد.");
-            }
-
-            // تبدیل مدل به DTO
-            var booksDto = books.Select(book => new BookCategoriesDto
-            {
-                Name = book.BookCategories.Name, // نام دسته‌بندی
-                ChildName = book.Name, // نام کتاب (به عنوان فرزند)
+                Id = book.BookCategories.Id,
+                Name = book.BookCategories.Name,
+                ChildName = book.Name,
                 Description = book.BookCategories.Description
             }).ToList();
-
-            return booksDto;
         }
 
-        public async Task<string> RemoveAsync(long bookId)
-        {
-
-            var existingBook = await _repository.Find<BookCategories>(b => b.Id == bookId);
-
-            if (existingBook == null)
-            {
-                return Messages.Error($"دسته بندی با شناسه پیدا نشد.");
-            }
-
-            try
-            {
-
-                await _repository.RemoveAsync(existingBook);
-                await _repository.SaveChangesAsync();
-
-
-                return Messages.Success("دسته بندی با موفقیت حذف شد.");
-            }
-            catch (Exception ex)
-            {
-
-                return Messages.Error($"خطایی در حذف دسته بندی رخ داد: {ex.Message}");
-            }
-        }
+       
     }
 }

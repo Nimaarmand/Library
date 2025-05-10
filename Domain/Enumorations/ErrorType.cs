@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 
 namespace Domain.Enumorations
 {
@@ -18,13 +13,19 @@ namespace Domain.Enumorations
         [Description("کتابی با این شناسه وجود ندارد")]
         BookIdNotFound = 1004,
         [Description("کتاب رزرو شده است")]
-        BookNotAvailable =1005,
+        BookNotAvailable = 1005,
         [Description("کاربر با این شناسه وجود ندارد")]
-        UserNotFound =1006,
+        UserNotFound = 1006,
         [Description("ورودی ها معتبر نیستند دوباره چک کنید")]
-        InvalidInput =1006,
+        InvalidInput = 1006,
         [Description("شناسه رزرو پیدا نشد")]
         ReservationIdNotFound = 1007,
         RoleHasAssociatedUsers = 1004,
+        [Description("شماره تلفن تکراری است")]
+        PhoneNumberAlreadyExists = 1008,
+        [Description("شماره تلفن نادرست است")]
+        InvalidPhoneNumber = 1009,
+        [Description("حساب شما فعال نیست")]
+        AccountInactive = 1010
     }
 }

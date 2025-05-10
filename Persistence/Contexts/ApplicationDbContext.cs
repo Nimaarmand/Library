@@ -1,15 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Application.Features.Definitions.Contexts;
 using Domain.Entities.Books;
-using System.Text.RegularExpressions;
-using Persistence.Seeds.ApplicationSeed;
+using Domain.Entities.Reservations;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Persistence.Configurations.ApplicationConfigurations;
-using Application.Features.Definitions.Contexts;
+using Persistence.Seeds.ApplicationSeed;
 
 namespace Persistence.Contexts
 {
@@ -22,8 +17,10 @@ namespace Persistence.Contexts
         public DbSet<Book> Books { get; set; }
 
         public DbSet<BookCategories> BookCategories { get; set; }
-        
 
+        public DbSet<Deliverys> Deliveries { get; set; }
+        public DbSet<DeliveryStatus> DeliveryStatus { get; set; }
+        public DbSet<Reservation> Reservations { get; set; }
 
 
 
@@ -32,15 +29,18 @@ namespace Persistence.Contexts
             #region Schema Sql
 
             builder.HasDefaultSchema("dbo");
-            builder.Entity<Book>().ToTable(nameof(Books), "Gnr");
+            //builder.Entity<Book>().ToTable(nameof(Books), "Gnr");
 
             #endregion
 
-           
+
 
             #region Configuration
 
             builder.ApplyConfiguration(new BookConfiguration());
+            builder.ApplyConfiguration(new ReservationConfigurations());
+            builder.ApplyConfiguration(new DeliveryConfigurations());
+            builder.ApplyConfiguration(new DeliveryStatusConfiguration());
 
             #endregion
 

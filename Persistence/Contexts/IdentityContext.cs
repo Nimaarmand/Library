@@ -1,14 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Domain.Entities.Users;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Domain.Entities.Users;
-using Persistence.Seeds.IdentitySeed;
 using Persistence.Configurations.IdentityConfigurations;
+using Persistence.Seeds.IdentitySeed;
 
 namespace Persistence.Contexts
 {
@@ -27,7 +22,7 @@ namespace Persistence.Contexts
             builder.Entity<IdentityRoleClaim<string>>().ToTable("RoleClaims", "identity");
             builder.Entity<IdentityUserClaim<string>>().ToTable("UserClaims", "identity");
             builder.Entity<IdentityUserLogin<string>>().ToTable("UserLogins", "identity");
-            builder.Entity<IdentityUserRole<string>>().ToTable("UserRoles", "identity"); 
+            builder.Entity<IdentityUserRole<string>>().ToTable("UserRoles", "identity");
             builder.Entity<IdentityUserToken<string>>().ToTable("UserTokens", "identity");
 
             #endregion

@@ -1,17 +1,11 @@
 ﻿using Application.Constants.Commons;
 using Application.Dtos.Books;
 using Application.Features.Definitions.Books;
+using Application.Features.Definitions.Contexts;
 using Application.Repositories;
 using AutoMapper;
 using Domain.Entities.Books;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Application.Features.Implementations.Books
 {
@@ -20,35 +14,49 @@ namespace Application.Features.Implementations.Books
     /// </summary>
     public class BookService : IBookService
     {
-        private readonly IGenericRepository _repository;
+        private readonly IApplicationDbContext _Context;
         private readonly IMapper _mapper;
 
-        public BookService(IGenericRepository repository, IMapper mapper)
+        public BookService(IApplicationDbContext context, IMapper mapper)
         {
-            _repository = repository;
             _mapper = mapper;
+            _Context = context;
         }
+
         public async Task<string> AddAsync(BookDto book)
         {
-            if (book != null)
+            if (book == null)
             {
-                var mappedBook = _mapper.Map<Book>(book);
-                await _repository.AddAsync(mappedBook);
-                await _repository.SaveChangesAsync();
-                return Messages.Success();
+                return Messages.Error("کتاب نمی‌تواند خالی باشد.");
             }
-            else
+
+            // تبدیل `BookDto` به `Book`
+            var mappedBook = _mapper.Map<Book>(book);
+
+            try
             {
-                return Messages.Error("کتاب نمی‌تواند خالی باشد."); // پیام خطا
+                await _Context.Books.AddAsync(mappedBook);
+                var result = await _Context.SaveChangesAsync();
+
+                // بررسی ذخیره موفقیت‌آمیز
+                if (result > 0)
+                {
+                    return Messages.Success("✅ ثبت اطلاعات با موفقیت انجام شد.");
+                }
+                else
+                {
+                    return Messages.Error("❌ ثبت اطلاعات انجام نشد.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return Messages.Error($"❌ خطا هنگام ثبت اطلاعات: {ex.Message}");
             }
         }
 
-       
-        public async Task<IEnumerable<Book>> GetAllBooksAsync(CancellationToken cancellationToken = default)
+        public async Task<List<Book>> GetAllBooksAsync(CancellationToken cancellationToken = default)
         {
-            return await _repository.GetAll<Book>(null, null, true, cancellationToken);
-
-
+            return await _Context.Books.ToListAsync(cancellationToken);
         }
 
         public async Task<string> UpdateAsync(BookDto bookDto)
@@ -58,30 +66,22 @@ namespace Application.Features.Implementations.Books
                 throw new ArgumentNullException(nameof(bookDto), "BookDto نمی‌تواند null باشد.");
             }
 
-            // پیدا کردن رکورد با شناسه
-            var existingBook = await _repository.Find<Book>(
-                b => b.Id == bookDto.Id
-            );
-
+            var existingBook = await _Context.Books.FirstOrDefaultAsync(b => b.Id == bookDto.Id);
             if (existingBook == null)
             {
                 return Messages.Error($"کتابی با شناسه {bookDto.Id} پیدا نشد.");
             }
 
-            // اعمال تغییرات به رکورد موجود
-            _mapper.Map(bookDto, existingBook); // به‌روزرسانی رکورد موجود با مقادیر جدید
+            _mapper.Map(bookDto, existingBook);
+            _Context.Books.Update(existingBook);
+            await _Context.SaveChangesAsync();
 
-            // ذخیره تغییرات با متد UpdateAsync
-            await _repository.UpdateAsync(existingBook);
-            await _repository.SaveChangesAsync();
-            // پیام موفقیت
             return Messages.Success();
         }
+
         public async Task<string> RemoveAsync(long bookId)
         {
-          
-            var existingBook = await _repository.Find<Book>(b => b.Id == bookId);
-
+            var existingBook = await _Context.Books.FirstOrDefaultAsync(b => b.Id == bookId);
             if (existingBook == null)
             {
                 return Messages.Error($"کتابی با شناسه {bookId} پیدا نشد.");
@@ -89,19 +89,15 @@ namespace Application.Features.Implementations.Books
 
             try
             {
-               
-                await _repository.RemoveAsync(existingBook);
-                await _repository.SaveChangesAsync();
+                _Context.Books.Remove(existingBook);
+                await _Context.SaveChangesAsync();
 
-               
                 return Messages.Success("کتاب با موفقیت حذف شد.");
             }
             catch (Exception ex)
             {
-              
                 return Messages.Error($"خطایی در حذف کتاب رخ داد: {ex.Message}");
             }
         }
-
     }
 }

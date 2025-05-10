@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Application.Dtos.Books;
+using Domain.Entities.Books;
 
 namespace Application.Features.Definitions.Books
 {
@@ -11,5 +8,9 @@ namespace Application.Features.Definitions.Books
     /// </summary>
     public interface IBookService
     {
+        Task<string> AddAsync(BookDto book);
+        public Task<List<Book>> GetAllBooksAsync(CancellationToken cancellationToken = default);
+        Task<string> UpdateAsync(BookDto bookDto);
+        Task<string> RemoveAsync(long bookId);
     }
 }

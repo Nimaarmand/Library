@@ -1,12 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Infrastructure;
+﻿using Domain.Entities.Books;
+using Domain.Entities.Reservations;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Domain.Entities.Books;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Domain.Entities.Reservations;
 
 namespace Application.Features.Definitions.Contexts
 {
@@ -15,6 +12,16 @@ namespace Application.Features.Definitions.Contexts
         DbContext Context { get; }
         DatabaseFacade Database { get; }
         DbSet<TEntity> Set<TEntity>() where TEntity : class;
+         DbSet<BookCategories> BookCategories { get; set; }
+        public DbSet<Book> Books { get; set; }
+        DbSet<Deliverys> Deliveries { get; set; }
+         DbSet<DeliveryStatus> DeliveryStatus { get; set; }
+         DbSet<Reservation> Reservations { get; set; }
+
+
+
+
+
         int SaveChanges();
         int SaveChanges(bool acceptAllChangesOnSuccess);
         Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default);
