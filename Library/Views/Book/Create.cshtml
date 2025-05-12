@@ -90,16 +90,16 @@
                             <input asp-for="PublicationDate" id="PublicationDate" class="form-control" />
                             <span asp-validation-for="PublicationDate" class="text-danger"></span>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <select class="form-select mt-4 mb-3" aria-label="انتخاب دسته بندی">
-                                    <option selected="">انتخاب دسته بندی</option>
-                                    <option value="1">یک</option>
-                                    <option value="2">دو</option>
-                                    <option value="3">سه</option>
-                                </select>
-                            </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="BookCategoriesId" class="form-label">دسته‌بندی</label>
+                            <select asp-for="BookCategoriesId" class="form-select mt-4 mb-3" asp-items="ViewBag.Categories">
+                                <option value="">انتخاب دسته‌بندی</option>
+                            </select>
+                            <span asp-validation-for="BookCategoriesId" class="text-danger"></span>
                         </div>
+
+
                         <div class="col-md-6" hidden>
                             <label asp-for="BookCategoriesId" class="form-label"></label>
                             <input asp-for="BookCategoriesId" id="BookCategoriesId" class="form-control" />
@@ -117,24 +117,33 @@
 
 
     <script>
-               $("#submitBtn").click(function () {
+        $("#submitBtn").click(function () {
+            
             var formData = new FormData($("#myForm")[0]);
 
             $.ajax({
                 type: "POST",
-                url: "/Book/Create",
+                url: "/Book/Create",  
                 data: formData,
                 processData: false,
                 contentType: false,
                 success: function (response) {
-                    console.log("✅ اطلاعات ارسال شد!", response);
+                   
+                    if (response.success) {
+                        alert(response.message); 
+                        window.location.href = "/Book/Booklist"; 
+                    } else {
+                        alert("خطا در ثبت اطلاعات: " + response.message);  
+                    }
                 },
                 error: function (xhr, status, error) {
+                  
                     console.error("❌ خطا در ارسال اطلاعات:", error);
                 }
             });
         });
     </script>
+
 
 </body>
 

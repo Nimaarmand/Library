@@ -41,6 +41,7 @@ namespace Persistence.Contexts
             builder.ApplyConfiguration(new ReservationConfigurations());
             builder.ApplyConfiguration(new DeliveryConfigurations());
             builder.ApplyConfiguration(new DeliveryStatusConfiguration());
+            //builder.ApplyConfiguration(new BookConfiguration());
 
             #endregion
 

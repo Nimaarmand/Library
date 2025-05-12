@@ -20,10 +20,6 @@ builder.Services.AddScoped<IBookCategories, BookCategoriesService>();
 
 
 
-//builder.Services.ConfigurePersistenceServices(builder.Configuration, builder.Environment);
-//builder.Services.ConfigureInfrastractureServices(builder.Configuration);
-//builder.Services.ConfigureApplicationServices();
-//builder.Services.ConfigureIdentityServices(builder.Configuration, builder.Environment);
 
 // اضافه کردن AutoMapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

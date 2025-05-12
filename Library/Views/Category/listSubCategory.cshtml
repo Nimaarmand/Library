@@ -1,10 +1,8 @@
 ﻿@model IEnumerable<Application.Dtos.Books.BookCategoriesDto>
 
 @{
-    ViewData["Title"] = "listCategory";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = null;
 }
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,7 +17,7 @@
 </head>
 <body>
     <div class="container mt-3">
-        <h2 class="text-center">لیست دسته بندی ها</h2>
+        <h2 class="text-center">لیست زیرمجموعه ها</h2>
         <div class="mb-3" dir="rtl">
             <div class="input-group">
                 <input type="text" class="form-control" id="searchInput" placeholder="جستجو کنید..." aria-label="جستجو" aria-describedby="searchIcon">
@@ -30,9 +28,9 @@
             <thead>
                 <tr>
                     <th hidden>  id</th>
-                    <th>نام دسته بندی</th>
-                    <th>تعداد زیر مجموعه</th>
-                    <th>توضیحات</th>
+                    <th>نام زیر مجموعه</th>
+                    <th hidden>تعداد زیر مجموعه</th>
+                    <th hidden>توضیحات</th>
                     <th>عملیات</th>
                 </tr>
             </thead>
@@ -42,8 +40,8 @@
                     <tr>
                         <td hidden>@item.Id</td hidden>
                         <td>@item.Name</td>
-                        <td>@item.ChildNumber</td>
-                        <td>@item.Description</td>
+                        
+                       
                         <td>
 
                             <div class="dropdown">
@@ -54,19 +52,19 @@
 
 
                                   
-                                      <li>
+                                      @* <li>
                                                 <a href="#" class="dropdown-item btn-add-sub" data-id="@item.Id">
                                                            <i class="fas fa-plus"></i> ثبت زیر مجموعه
                                                 </a>
-                                      </li>
+                                      </li> *@
 
 
 
-                                    <li>
+                                 @*    <li>
                                        <a class="dropdown-item btn-show-sub" href="#" data-id="@item.Id">
                                             <i class="fas fa-eye"></i> نمایش زیر مجموعه
                                        </a>
-                                    </li> 
+                                    </li>  *@
 
                                     <li>
                                                <a class="dropdown-item btn-edit" href="#" data-id="@item.Id">
@@ -203,9 +201,4 @@
 
 </body>
 
-</html>
 
-
-
-
-   

@@ -27,7 +27,7 @@ namespace Application.Features.Implementations.Books
 
             if (string.IsNullOrWhiteSpace(reservationDto.UserId) || reservationDto.BookId <= 0)
             {
-                return "اطلاعات ورودی نامعتبر است.";
+                throw new MyArgumentNullException(ErrorType.InvalidInput);
             }
 
 
@@ -41,13 +41,13 @@ namespace Application.Features.Implementations.Books
             var book = await _repository.GetById<Book>(reservationDto.BookId);
             if (book == null)
             {
-                return "کتاب موردنظر یافت نشد.";
+                throw new MyArgumentNullException(ErrorType.BookIdNotFound);
             }
 
 
             if (!book.IsAvailable)
             {
-                return "کتاب موردنظر قابل رزرو نیست.";
+                throw new MyArgumentNullException(ErrorType.IsAvailable);
             }
 
 

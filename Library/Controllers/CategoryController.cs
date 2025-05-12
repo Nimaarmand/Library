@@ -1,6 +1,8 @@
 ﻿using Application.Dtos.Books;
+using Application.Exceptions.ValidationExceptions;
 using Application.Features.Definitions.Books;
 using Application.Features.Implementations.Books;
+using Domain.Enumorations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,33 +15,88 @@ namespace Library.Controllers
         {
             _categories = categories;
         }
-        // GET: CategoriesController
-        public async Task<IActionResult> listCategory()
+       
+        public async Task<IActionResult> listCategory(long? parentId)
         {
-            var categoryList = await _categories.GetAllCategoriesAsync(); 
+            var categoryList = await _categories.GetAllCategoriesAsync(parentId); 
             return View(categoryList);
         }
 
-        // GET: CategoriesController/Details/5
-        public ActionResult Details(int id)
+        public async Task<IActionResult> listSubCategory(long parentId)
+        {
+            if(parentId !=null)
+            {
+                var categoryList = await _categories.GetAllCategoriesAsync(parentId);
+                return View(categoryList);
+            }
+            return NotFound();
+          
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> AddSubCategory(long parentid)
+        {
+
+           if(parentid != 0)
+            {
+                var parent = await _categories.FindAsync(parentid);
+                if (parent == null)
+                    return NotFound();
+                return View(parent);  
+            }
+            return NotFound();
+           
+        }
+        [HttpPost]
+        public async Task<IActionResult> AddSubCategory([FromBody] BookCategoriesDto dto)
+        {
+           
+
+            var result = await _categories.AddChildAsync(dto);
+            if (result == null)
+                return BadRequest(new { success = false, message = "خطا در افزودن زیر مجموعه." });
+
+            return Ok(new { success = true, message = "زیر مجموعه با موفقیت اضافه شد." });
+        }
+
+        [HttpGet]
+        public IActionResult Create()
         {
             return View();
         }
 
-        // GET: CategoriesController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-       
         [HttpPost]
 
-        public IActionResult Create(BookCategoriesDto categoriesDto)
+        public async Task<IActionResult> Create(BookCategoriesDto categoriesDto)
         {
             try
             {
-                var result = _categories.AddAsync(categoriesDto);
+                var result = await _categories.AddAsync(categoriesDto); // اضافه کردن await
+                return Json(new { success = true, message = "عملیات با موفقیت انجام شد!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "خطا در انجام عملیات!", error = ex.Message });
+            }
+        }
+        public async Task<IActionResult> Edit(long id)
+        {
+            var category = await _categories.FindAsync(id); 
+
+            if (category == null)
+            {
+                return NotFound();
+            } 
+
+            return View(category); 
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(BookCategoriesDto categoriesDto)
+        {
+            try
+            {
+                await _categories.UpdateAsync(categoriesDto); 
                 return Json(new { success = true, message = "عملیات با موفقیت انجام شد!" });
             }
             catch
@@ -47,47 +104,36 @@ namespace Library.Controllers
                 return Json(new { success = false, message = "خطا در انجام عملیات!" });
             }
         }
-
-        // GET: CategoriesController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: CategoriesController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: CategoriesController/Delete/5
+  
         public ActionResult Delete(int id)
         {
             return View();
         }
 
-        // POST: CategoriesController/Delete/5
+       
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        
+        public ActionResult Delete(long id)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                _categories.RemoveAsync(id);
+
+                return Json(new { success = true, message = "عملیات با موفقیت انجام شد!" });
             }
             catch
             {
                 return View();
             }
         }
+      
+
+        //[HttpGet]
+        public IActionResult Delete()
+        {
+
+            return View();
+        }
+       
     }
 }

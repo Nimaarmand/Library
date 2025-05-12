@@ -20,6 +20,8 @@ namespace Domain.Enumorations
         InvalidInput = 1006,
         [Description("شناسه رزرو پیدا نشد")]
         ReservationIdNotFound = 1007,
+        [Description("کتاب در دسترس نمی باشد")]
+        IsAvailable=1011,
         RoleHasAssociatedUsers = 1004,
         [Description("شماره تلفن تکراری است")]
         PhoneNumberAlreadyExists = 1008,

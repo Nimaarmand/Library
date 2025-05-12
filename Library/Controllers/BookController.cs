@@ -1,15 +1,18 @@
 ﻿using Application.Dtos.Books;
 using Application.Features.Definitions.Books;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Library.Controllers
 {
     public class BookController : Controller
     {
         private readonly IBookService _bookService;
-        public BookController(IBookService bookService)
+        private readonly IBookCategories _bookCategories;
+        public BookController(IBookService bookService, IBookCategories bookCategories)
         {
             _bookService = bookService;
+            _bookCategories = bookCategories;
         }
         // GET: BookController
         public IActionResult Booklist()
@@ -24,10 +27,23 @@ namespace Library.Controllers
         }
 
 
-        public IActionResult Create()
-        {
-            return View();
-        }
+        //public async Task< IActionResult> Create()
+        //{
+        //    var categories = _bookCategories.GetAllCategoriesAsync().Result;
+
+        //    var categoryItems = categories.Select(c => new SelectListItem
+        //    {
+        //        Value = c.Id.ToString(),
+        //        Text = c.ChildName != null
+        //            ? $"{c.Name} - {c.ChildName}"
+        //            : c.Name
+        //    }).ToList();
+
+        //    ViewBag.Categories = categoryItems;
+
+        //    return View();
+        //}
+
 
 
         [HttpPost]

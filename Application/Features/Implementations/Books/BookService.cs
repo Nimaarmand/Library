@@ -1,5 +1,6 @@
 ﻿using Application.Constants.Commons;
 using Application.Dtos.Books;
+using Application.Exceptions.ValidationExceptions;
 using Application.Features.Definitions.Books;
 using Application.Features.Definitions.Contexts;
 using Application.Repositories;
@@ -30,7 +31,7 @@ namespace Application.Features.Implementations.Books
                 return Messages.Error("کتاب نمی‌تواند خالی باشد.");
             }
 
-            // تبدیل `BookDto` به `Book`
+           
             var mappedBook = _mapper.Map<Book>(book);
 
             try
@@ -38,7 +39,7 @@ namespace Application.Features.Implementations.Books
                 await _Context.Books.AddAsync(mappedBook);
                 var result = await _Context.SaveChangesAsync();
 
-                // بررسی ذخیره موفقیت‌آمیز
+             
                 if (result > 0)
                 {
                     return Messages.Success("✅ ثبت اطلاعات با موفقیت انجام شد.");
@@ -69,7 +70,7 @@ namespace Application.Features.Implementations.Books
             var existingBook = await _Context.Books.FirstOrDefaultAsync(b => b.Id == bookDto.Id);
             if (existingBook == null)
             {
-                return Messages.Error($"کتابی با شناسه {bookDto.Id} پیدا نشد.");
+                throw new MyArgumentNullException(ErrorType.BookIdNotFound); 
             }
 
             _mapper.Map(bookDto, existingBook);
@@ -84,7 +85,7 @@ namespace Application.Features.Implementations.Books
             var existingBook = await _Context.Books.FirstOrDefaultAsync(b => b.Id == bookId);
             if (existingBook == null)
             {
-                return Messages.Error($"کتابی با شناسه {bookId} پیدا نشد.");
+                throw new MyArgumentNullException(ErrorType.BookIdNotFound);
             }
 
             try

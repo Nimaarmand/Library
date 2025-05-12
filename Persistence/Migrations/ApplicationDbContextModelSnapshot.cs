@@ -106,48 +106,22 @@ namespace Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<string>("ChildName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long?>("ChildNumber")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime?>("DeleteTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeleteUserId")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("InsertTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("InsertUserId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("IsDeleted")
-                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("UpdateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UpdateUserId")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<long?>("ParentId")
+                        .HasColumnType("bigint");
 
                     b.Property<long>("bookId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ParentId");
 
                     b.ToTable("BookCategories", "dbo");
                 });
@@ -307,6 +281,15 @@ namespace Persistence.Migrations
                     b.Navigation("BookCategories");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Books.BookCategories", b =>
+                {
+                    b.HasOne("Domain.Entities.Books.BookCategories", "Parent")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentId");
+
+                    b.Navigation("Parent");
+                });
+
             modelBuilder.Entity("Domain.Entities.Reservations.DeliveryStatus", b =>
                 {
                     b.HasOne("Domain.Entities.Reservations.Deliverys", "Delivery")
@@ -370,6 +353,8 @@ namespace Persistence.Migrations
             modelBuilder.Entity("Domain.Entities.Books.BookCategories", b =>
                 {
                     b.Navigation("Book");
+
+                    b.Navigation("Children");
                 });
 
             modelBuilder.Entity("Domain.Entities.Reservations.Deliverys", b =>
