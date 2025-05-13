@@ -14,35 +14,48 @@ namespace Library.Controllers
             _bookService = bookService;
             _bookCategories = bookCategories;
         }
-        // GET: BookController
-        public IActionResult Booklist()
+
+        public async Task<IActionResult> Booklist()
         {
-            return View();
+            var listbook = await _bookService.GetAllBooksAsync(); // حتماً await استفاده شود
+            return View(listbook);
         }
 
-        // GET: BookController/Details/5
+
         public ActionResult IActionResult(int id)
         {
             return View();
         }
 
 
-        //public async Task< IActionResult> Create()
-        //{
-        //    var categories = _bookCategories.GetAllCategoriesAsync().Result;
+        public async Task<IActionResult> Create(long? id)
+        {
+            var categories = await _bookCategories.GetAllCategoriesAsync(id);
 
-        //    var categoryItems = categories.Select(c => new SelectListItem
-        //    {
-        //        Value = c.Id.ToString(),
-        //        Text = c.ChildName != null
-        //            ? $"{c.Name} - {c.ChildName}"
-        //            : c.Name
-        //    }).ToList();
+            var categoryItems = new List<SelectListItem>();
 
-        //    ViewBag.Categories = categoryItems;
+            foreach (var category in categories)
+            {
+                categoryItems.Add(new SelectListItem
+                {
+                    Value = category.Id.ToString(),
+                    Text = category.Name
+                });
 
-        //    return View();
-        //}
+                foreach (var child in category.Children)
+                {
+                    categoryItems.Add(new SelectListItem
+                    {
+                        Value = child.Id.ToString(),
+                        Text = child.Name // نمایش با "--" برای تشخیص فرزندها
+                    });
+                }
+            }
+
+            ViewBag.Categories = categoryItems;
+
+            return View();
+        }
 
 
 
@@ -60,25 +73,58 @@ namespace Library.Controllers
             }
         }
 
-        // GET: BookController/Edit/5
-        public IActionResult Edit(int Id)
+        [HttpGet]
+        public async Task<IActionResult> Edit(long id)
         {
+            var categories = await _bookCategories.GetAllCategoriesAsync(id);
 
-            return View();
+            var categoryItems = new List<SelectListItem>();
+
+            foreach (var parentCategory in categories)
+            {
+                categoryItems.Add(new SelectListItem
+                {
+                    Value = parentCategory.Id.ToString(),
+                    Text = parentCategory.Name
+                });
+
+                foreach (var child in parentCategory.Children)
+                {
+                    categoryItems.Add(new SelectListItem
+                    {
+                        Value = child.Id.ToString(),
+                        Text = "-- " + child.Name 
+                    });
+                }
+            }
+
+            ViewBag.Categories = categoryItems;
+
+            var book = await _bookService.FindAsync(id);
+
+            if (book == null)
+            {
+                return NotFound();
+            }
+
+            return View(book);
         }
 
-        // POST: BookController/Edit/5
+
+
+
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, IFormCollection collection)
+       
+        public IActionResult Edit(BookDto bookDto)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                 _bookService.UpdateAsync(bookDto);
+                return Json(new { success = true, message = "عملیات با موفقیت انجام شد!" });
             }
             catch
             {
-                return View();
+                return Json(new { success = false, message = "خطا در انجام عملیات!" });
             }
         }
 

@@ -1,25 +1,32 @@
-﻿@model IEnumerable<Application.Dtos.Books.BookCategoriesDto>
+﻿@model IEnumerable<Application.Dtos.Books.BookDto>
 
 @{
-    ViewData["Title"] = "listCategory";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = null;
 }
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <title>Bootstrap Example</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 </head>
+
+
 <body>
     <div class="container mt-3">
-        <h2 class="text-center">لیست دسته بندی ها</h2>
+        <h2 class="text-center">لیست کتاب ها</h2>
         <div class="mb-3" dir="rtl">
             <div class="input-group">
                 <input type="text" class="form-control" id="searchInput" placeholder="جستجو کنید..." aria-label="جستجو" aria-describedby="searchIcon">
@@ -30,10 +37,15 @@
             <thead>
                 <tr>
                     <th hidden>  id</th>
-                    <th>نام دسته بندی</th>
-                    <th>تعداد زیر مجموعه</th>
-                    <th>توضیحات</th>
-                    <th>عملیات</th>
+                    <th>نام کتاب</th>
+                    <th>موضوع</th>
+                    <th>نویسنده</th>                  
+                    <th>ناشر</th>
+                    <th>زبان</th>
+                    <th>تاریخ انتشار</th>
+                     <th> وضعیت کتاب</th>
+                     <th hidden> بارکد </th>
+                     <th>عملیات</th>
                 </tr>
             </thead>
             <tbody>
@@ -42,8 +54,13 @@
                     <tr>
                         <td hidden>@item.Id</td hidden>
                         <td>@item.Name</td>
-                        <td>@item.ChildNumber</td>
-                        <td>@item.Description</td>
+                        <td>@item.Subject</td>
+                        <td>@item.Author</td>
+                        <td>@item.Publisher</td>
+                        <td>@item.Language</td>
+                        <td>@item.PublicationDate</td>
+                        <td>@item.IsAvailable</td>
+                        <td hidden>@item.ISBN</td>
                         <td>
 
                             <div class="dropdown">
@@ -56,7 +73,7 @@
                                   
                                       <li>
                                                 <a href="#" class="dropdown-item btn-add-sub" data-id="@item.Id">
-                                                           <i class="fas fa-plus"></i> ثبت زیر مجموعه
+                                                           <i class="fas fa-plus"></i> رزرو کتاب
                                                 </a>
                                       </li>
 
@@ -117,7 +134,7 @@
         });
 
         $(document).ready(function () {
-            // Delete category
+            // Delete 
             $(".delete-category").click(function (e) {
                 e.preventDefault();
 
@@ -136,7 +153,7 @@
                     if (result.isConfirmed) {
                         $.ajax({
                             type: "POST",
-                            url: "/Category/Delete",
+                            url: "/Books/Delete",
                             data: { id: categoryId },
                             success: function (response) {
                                 if (response.success) {
@@ -198,29 +215,26 @@
          });
          });
 
-         $(document).ready(function () {
-        $(".btn-edit").click(function (e) {
-                    e.preventDefault(); 
+        $(document).ready(function () {
+    $(".btn-edit").click(function (e) {
+        e.preventDefault();
 
-                    var categoryId = $(this).data("id"); 
-               if (categoryId) {
-                             window.location.href = "/Category/Edit?id=" + categoryId; 
-               }           else {
-                        Swal.fire({
-                          icon: "error",
-                          title: "خطا!",
-                            text: "شناسه دسته‌بندی نامعتبر است."
-                    });
-               }
-        });
-        });
+        var bookId = $(this).data("id"); // اطمینان از اینکه ID درست دریافت می‌شود
+        if (bookId) {
+            window.location.href = "/Book/Edit/" + bookId;
+
+        } else {
+            Swal.fire({
+                icon: "error",
+                title: "خطا!",
+                text: "شناسه کتاب نامعتبر است."
+            });
+        }
+    });
+});
+
     </script>
 
 </body>
 
 </html>
-
-
-
-
-   

@@ -12,6 +12,6 @@ namespace Application.Dtos.Books
         public int ChildNumber { get; set; }
         public long? ParentId { get; set; }               
         public long? BookId { get; set; }
-
+        public List<BookCategoriesDto> Children { get; internal set; }
     }
 }

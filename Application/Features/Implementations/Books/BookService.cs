@@ -55,9 +55,11 @@ namespace Application.Features.Implementations.Books
             }
         }
 
-        public async Task<List<Book>> GetAllBooksAsync(CancellationToken cancellationToken = default)
+        public async Task<List<BookDto>> GetAllBooksAsync()
         {
-            return await _Context.Books.ToListAsync(cancellationToken);
+            var listbook = await _Context.Books.ToListAsync();
+            var books=_mapper.Map <List<BookDto>>(listbook);
+            return books;
         }
 
         public async Task<string> UpdateAsync(BookDto bookDto)
@@ -99,6 +101,20 @@ namespace Application.Features.Implementations.Books
             {
                 return Messages.Error($"خطایی در حذف کتاب رخ داد: {ex.Message}");
             }
+        }
+        public async Task<BookDto> FindAsync(long id)
+        {
+            if (id <= 0)
+            {
+                throw new MyArgumentNullException(ErrorType.InvalidInput);
+            }
+
+            var book = await _Context.Books.FindAsync(id);
+
+            if (book == null) return null;
+            var books = _mapper.Map<BookDto>(book);
+            return books;
+
         }
     }
 }

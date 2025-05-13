@@ -52,7 +52,7 @@ namespace Persistence.Migrations
                     Publisher = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Language = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsAvailable = table.Column<bool>(type: "bit", nullable: false),
-                    PublicationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PublicationDate = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BookCategoriesId = table.Column<long>(type: "bigint", nullable: false),
                     InsertTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdateTime = table.Column<DateTime>(type: "datetime2", nullable: true),

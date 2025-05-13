@@ -1,0 +1,167 @@
+﻿@model Application.Dtos.Books.BookDto
+
+@{
+    ViewData["Title"] = "ویرایش کتاب";
+}
+
+<div class="container mt-4" dir="rtl">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <form asp-action="Edit" id="editForm">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                <div class="row">
+                    <div class="col-md-6" hidden>
+                        <label asp-for="Id" class="form-label">شناسه</label>
+                        <input asp-for="Id" class="form-control" readonly />
+                        <span asp-validation-for="Id" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Name" class="form-label">نام کتاب</label>
+                        <input asp-for="Name" class="form-control" required data-required-msg="نام کتاب الزامی است" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                        <span class="k-invalid-msg" data-for="Name"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Author" class="form-label">نویسنده</label>
+                        <input asp-for="Author" class="form-control" required data-required-msg="نویسنده الزامی است" />
+                        <span asp-validation-for="Author" class="text-danger"></span>
+                        <span class="k-invalid-msg" data-for="Author"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Subject" class="form-label">موضوع</label>
+                        <input asp-for="Subject" class="form-control" required data-required-msg="موضوع الزامی است" />
+                        <span asp-validation-for="Subject" class="text-danger"></span>
+                        <span class="k-invalid-msg" data-for="Subject"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="ISBN" class="form-label">بارکد</label>
+                        <input asp-for="ISBN" class="form-control" required data-required-msg="بارکد الزامی است" />
+                        <span asp-validation-for="ISBN" class="text-danger"></span>
+                        <span class="k-invalid-msg" data-for="ISBN"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Pages" class="form-label">تعداد صفحات</label>
+                        <input asp-for="Pages" class="form-control" required data-required-msg="تعداد صفحات الزامی است" />
+                        <span asp-validation-for="Pages" class="text-danger"></span>
+                        <span class="k-invalid-msg" data-for="Pages"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Publisher" class="form-label">ناشر</label>
+                        <input asp-for="Publisher" class="form-control" required data-required-msg="ناشر الزامی است" />
+                        <span asp-validation-for="Publisher" class="text-danger"></span>
+                        <span class="k-invalid-msg" data-for="Publisher"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Language" class="form-label">زبان</label>
+                        <input asp-for="Language" class="form-control" required data-required-msg="زبان الزامی است" />
+                        <span asp-validation-for="Language" class="text-danger"></span>
+                        <span class="k-invalid-msg" data-for="Language"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="PublicationDate" class="form-label">تاریخ انتشار</label>
+                        <input asp-for="PublicationDate" class="form-control" type="text" required data-required-msg="تاریخ انتشار الزامی است" />
+                        <span asp-validation-for="PublicationDate" class="text-danger"></span>
+                        <span class="k-invalid-msg" data-for="PublicationDate"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="BookCategoriesId" class="form-label">دسته‌بندی</label>
+                        <select asp-for="BookCategoriesId" asp-items="ViewBag.Categories" class="form-select mt-4 mb-3" required data-required-msg="دسته‌بندی را انتخاب کنید">
+                            <option value="">انتخاب دسته‌بندی</option>
+                        </select>
+                        <span asp-validation-for="BookCategoriesId" class="text-danger"></span>
+                        <span class="k-invalid-msg" data-for="BookCategoriesId"></span>
+                    </div>
+
+                    
+                </div>
+
+                <div class="d-grid mt-3">
+                    <button type="button" id="submitEdit" class="btn btn-primary">ثبت تغییرات</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Kendo UI -->
+    <script src="https://kendo.cdn.telerik.com/2024.1.319/js/kendo.all.min.js"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        $(document).ready(function () {
+            var validator = $("#editForm").kendoValidator({
+                messages: {
+                    required: "پر کردن این فیلد الزامی است."
+                },
+                validate: function () {
+                    $(".k-invalid-msg").css("color", "red");
+                }
+            }).data("kendoValidator");
+
+            $("#submitEdit").click(function () {
+                if (!validator.validate()) {
+                    $(".k-invalid-msg").css("color", "red");
+                    $(".k-invalid").css("border-color", "red");
+                    return;
+                }
+
+                var formData = new FormData($("#editForm")[0]);
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Book/Edit",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+
+                            setTimeout(function () {
+                                window.location.href = "/Book/Booklist";
+                            }, 2000);
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'خطا در ثبت اطلاعات',
+                                text: response.message,
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'خطای سرور',
+                            text: 'ارسال اطلاعات با خطا مواجه شد.',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+

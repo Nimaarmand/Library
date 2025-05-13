@@ -76,10 +76,17 @@ namespace Application.Features.Implementations.Books
                 .Where(c => c.ParentId == parentId)
                 .Select(c => new BookCategoriesDto
                 {
-                    Id= c.Id,
+                    Id = c.Id,
                     Name = c.Name,
-                    Description = c.Description,
-                    ChildNumber = _Context.BookCategories.Count(sub => sub.ParentId == c.Id)
+                    
+                    ChildNumber = _Context.BookCategories.Count(sub => sub.ParentId == c.Id),
+                    Children = _Context.BookCategories.Where(sub => sub.ParentId == c.Id)
+                        .Select(sub => new BookCategoriesDto
+                        {
+                            Id = sub.Id,
+                            Name = "-- " + sub.Name, // اضافه کردن پیشوند برای نمایش فرزند
+                           
+                        }).ToList()
                 })
                 .ToListAsync();
 

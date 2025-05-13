@@ -79,6 +79,7 @@ namespace Library.Controllers
                 return Json(new { success = false, message = "خطا در انجام عملیات!", error = ex.Message });
             }
         }
+        [HttpGet]
         public async Task<IActionResult> Edit(long id)
         {
             var category = await _categories.FindAsync(id); 
@@ -104,20 +105,26 @@ namespace Library.Controllers
                 return Json(new { success = false, message = "خطا در انجام عملیات!" });
             }
         }
-  
-        public ActionResult Delete(int id)
+
+
+        [HttpGet]
+        public IActionResult Delete( )
         {
             return View();
         }
 
-       
         [HttpPost]
         
-        public ActionResult Delete(long id)
+        public async Task<IActionResult> Delete(long Id )
         {
             try
             {
-                _categories.RemoveAsync(id);
+                if (Id == null)
+                {
+                    return NotFound();
+                }
+                var category = await _categories.FindAsync(Id); 
+                _categories.RemoveAsync(Id);
 
                 return Json(new { success = true, message = "عملیات با موفقیت انجام شد!" });
             }
@@ -128,12 +135,7 @@ namespace Library.Controllers
         }
       
 
-        //[HttpGet]
-        public IActionResult Delete()
-        {
-
-            return View();
-        }
+        
        
     }
 }

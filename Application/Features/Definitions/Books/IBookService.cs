@@ -9,7 +9,8 @@ namespace Application.Features.Definitions.Books
     public interface IBookService
     {
         Task<string> AddAsync(BookDto book);
-        public Task<List<Book>> GetAllBooksAsync(CancellationToken cancellationToken = default);
+        Task<BookDto> FindAsync(long id);
+        public Task<List<BookDto>> GetAllBooksAsync();
         Task<string> UpdateAsync(BookDto bookDto);
         Task<string> RemoveAsync(long bookId);
     }

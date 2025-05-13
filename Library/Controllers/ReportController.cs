@@ -33,7 +33,7 @@ namespace Library.Controllers
                     b.Author,
                     b.Subject,
                     b.BookCategories,
-                    b.InsertTime,
+                    //b.InsertTime,
                 }).ToList(); // فقط فیلدهای موردنظر نمایش داده شوند
 
             report.RegData("Books", books);
