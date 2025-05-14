@@ -110,9 +110,9 @@ namespace Application.Features.Implementations.Identity
                 user.PhoneNumber = request.PhoneNumber;
             }
 
-            user.FirstName = request.FirstName ?? user.FirstName;
-            user.LastName = request.LastName ?? user.LastName;
-            user.ConcurrencyStamp = Guid.NewGuid().ToString();
+            //user.FirstName = request.FirstName ?? user.FirstName;
+            //user.LastName = request.LastName ?? user.LastName;
+            //user.ConcurrencyStamp = Guid.NewGuid().ToString();
 
             var updateResult = await _userManager.UpdateAsync(user);
             if (updateResult.Succeeded)

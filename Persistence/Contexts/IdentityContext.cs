@@ -5,43 +5,32 @@ using Microsoft.EntityFrameworkCore;
 using Persistence.Configurations.IdentityConfigurations;
 using Persistence.Seeds.IdentitySeed;
 
-namespace Persistence.Contexts
+
+public class IdentityContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>
 {
-    public class IdentityContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>
+    public IdentityContext(DbContextOptions<IdentityContext> options) : base(options) { }
+
+ 
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        public IdentityContext(DbContextOptions<IdentityContext> options) : base(options) { }
+        base.OnModelCreating(builder); // این را فراموش نکن
 
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            // base.OnModelCreating(builder);
+       
 
-            #region Schema Sql
+        #region کلیدهای ترکیبی برای جدول‌های میانی
+        builder.Entity<IdentityUserLogin<string>>().HasKey(l => new { l.LoginProvider, l.ProviderKey });
+        builder.Entity<IdentityUserRole<string>>().HasKey(r => new { r.UserId, r.RoleId });
+        builder.Entity<IdentityUserToken<string>>().HasKey(t => new { t.UserId, t.LoginProvider, t.Name });
+        #endregion
 
-            builder.Entity<IdentityUser<string>>().ToTable("Users", "identity");
-            builder.Entity<IdentityRole<string>>().ToTable("Roles", "identity");
-            builder.Entity<IdentityRoleClaim<string>>().ToTable("RoleClaims", "identity");
-            builder.Entity<IdentityUserClaim<string>>().ToTable("UserClaims", "identity");
-            builder.Entity<IdentityUserLogin<string>>().ToTable("UserLogins", "identity");
-            builder.Entity<IdentityUserRole<string>>().ToTable("UserRoles", "identity");
-            builder.Entity<IdentityUserToken<string>>().ToTable("UserTokens", "identity");
+        #region اعمال تنظیمات اختصاصی (در صورت نیاز)
+        builder.ApplyConfiguration(new RoleConfiguration());     // اختیاری
+        builder.ApplyConfiguration(new UserConfiguration());     // اختیاری
+        builder.ApplyConfiguration(new UserRoleConfiguration()); // اختیاری
+        #endregion
 
-            #endregion
-
-            builder.Entity<IdentityUserLogin<string>>().HasKey(i => new { i.ProviderKey, i.LoginProvider });
-            builder.Entity<IdentityUserRole<string>>().HasKey(i => new { i.UserId, i.RoleId });
-            builder.Entity<IdentityUserToken<string>>().HasKey(i => new { i.UserId, i.LoginProvider });
-
-            #region Configuration
-
-            builder.ApplyConfiguration(new RoleConfiguration());
-            builder.ApplyConfiguration(new UserConfiguration());
-            builder.ApplyConfiguration(new UserRoleConfiguration());
-
-            #endregion
-
-            //Seed Data
-            IdentityDbContextSeed.SeedData(builder);
-
-        }
+        #region Seed اولیه اطلاعات (در صورت نیاز)
+        IdentityDbContextSeed.SeedData(builder); // اگر فایل SeedData داری
+        #endregion
     }
 }

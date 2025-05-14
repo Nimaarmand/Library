@@ -28,6 +28,12 @@ namespace Domain.Enumorations
         [Description("شماره تلفن نادرست است")]
         InvalidPhoneNumber = 1009,
         [Description("حساب شما فعال نیست")]
-        AccountInactive = 1010
+        AccountInactive = 1010,
+        [Description("نام کاربری یا رمز عبور اشتباه است")]
+        InvalidCredentials = 1012,
+        [Description("حساب کاربری شما قفل شده است")]
+        AccountLocked = 1013,
+
+        AccountNotAllowed = 1014
     }
 }

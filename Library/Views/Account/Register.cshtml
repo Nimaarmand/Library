@@ -1,0 +1,192 @@
+﻿@model Application.Dtos.Identity.RegisterationRequest
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title> ثبت‌نام</title>
+
+    <!-- Bootstrap RTL -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet" />
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- Kendo UI -->
+    <link href="https://kendo.cdn.telerik.com/2024.1.130/styles/kendo.default-v2.min.css" rel="stylesheet" />
+</head>
+<body class="bg-light">
+
+    <div class="container mt-5 d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+        <div class="col-md-6 bg-white p-4 shadow rounded">
+            <h4 class="mb-4 text-center"> ثبت‌نام</h4>
+
+            <!-- فرم ثبت‌نام -->
+            <form id="registerForm" method="post" action="/YourController/Register" dir="rtl" class="w-50 mx-auto mt-5">
+                <div id="validationSummary" class="alert alert-danger d-none"></div>
+
+                <!-- شماره تلفن -->
+                <div class="mb-3">
+                    <label for="PhoneNumber" class="form-label">شماره تلفن</label>
+                    <input id="PhoneNumber" name="PhoneNumber" class="form-control"
+                           required pattern="^(\+98|0)?9\d{9}$"
+                           data-required-msg="شماره تلفن الزامی است"
+                           data-pattern-msg="شماره تلفن معتبر نیست" />
+                    <div class="invalid-feedback" id="phoneError"></div>
+                </div>
+
+                <!-- رمز عبور -->
+                <div class="mb-3">
+                    <label for="Password" class="form-label">رمز عبور</label>
+                    <div class="input-group">
+                        <input id="Password" name="Password" class="form-control" type="password"
+                               required minlength="6"
+                               data-required-msg="رمز عبور الزامی است"
+                               data-minlength-msg="رمز عبور باید حداقل 6 کاراکتر باشد" />
+                        <button type="button" class="btn btn-outline-secondary toggle-password" data-target="Password">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                    <div class="invalid-feedback" id="passwordError"></div>
+                </div>
+
+                <!-- تکرار رمز عبور -->
+                <div class="mb-3">
+                    <label for="RePassword" class="form-label">تکرار رمز عبور</label>
+                    <div class="input-group">
+                        <input id="RePassword" name="RePassword" class="form-control" type="password"
+                               required data-required-msg="تکرار رمز عبور الزامی است" />
+                        <button type="button" class="btn btn-outline-secondary toggle-password" data-target="RePassword">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                    <div class="invalid-feedback" id="repasswordError"></div>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">ثبت‌نام</button>
+                </div>
+            </form>
+
+
+
+
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://kendo.cdn.telerik.com/2024.1.130/js/kendo.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        $(document).ready(function () {
+            const validator = $("#registerForm").kendoValidator({
+                messages: {
+                    required: "فیلد الزامی است",
+                    pattern: "فرمت وارد شده معتبر نیست",
+                    minlength: "رمز عبور باید حداقل 6 کاراکتر باشد"
+                },
+                rules: {
+                    matchPasswords: function (input) {
+                        if (input.is("#RePassword")) {
+                            return input.val() === $("#Password").val();
+                        }
+                        return true;
+                    }
+                }
+            }).data("kendoValidator");
+
+            $(".toggle-password").click(function () {
+                const targetId = $(this).data("target");
+                const input = $("#" + targetId);
+                const icon = $(this).find("i");
+
+                if (input.attr("type") === "password") {
+                    input.attr("type", "text");
+                    icon.removeClass("bi-eye").addClass("bi-eye-slash");
+                } else {
+                    input.attr("type", "password");
+                    icon.removeClass("bi-eye-slash").addClass("bi-eye");
+                }
+            });
+
+            $("#registerForm").on("submit", function (e) {
+                e.preventDefault();
+
+                $(".form-control").removeClass("is-invalid");
+                $(".invalid-feedback").text("");
+
+                const isValid = validator.validate();
+                let hasError = false;
+
+                // اعتبارسنجی دستی
+                if (!$("#PhoneNumber").val().match(/^(\+98|0)?9\d{9}$/)) {
+                    $("#PhoneNumber").addClass("is-invalid");
+                    $("#phoneError").text("شماره تلفن معتبر نیست");
+                    hasError = true;
+                }
+
+                if (!$("#Password").val()) {
+                    $("#Password").addClass("is-invalid");
+                    $("#passwordError").text("رمز عبور الزامی است");
+                    hasError = true;
+                } else if ($("#Password").val().length < 6) {
+                    $("#Password").addClass("is-invalid");
+                    $("#passwordError").text("رمز عبور باید حداقل 6 کاراکتر باشد");
+                    hasError = true;
+                }
+
+                if (!$("#RePassword").val()) {
+                    $("#RePassword").addClass("is-invalid");
+                    $("#repasswordError").text("تکرار رمز عبور الزامی است");
+                    hasError = true;
+                } else if ($("#RePassword").val() !== $("#Password").val()) {
+                    $("#RePassword").addClass("is-invalid");
+                    $("#repasswordError").text("رمز عبور و تکرار آن یکسان نیستند");
+                    hasError = true;
+                }
+
+                if (isValid && !hasError) {
+                   
+                    $.ajax({
+                        url: '/Account/Register', 
+                        method: 'POST',
+                        data: {
+                            PhoneNumber: $("#PhoneNumber").val(),
+                            Password: $("#Password").val(),
+                            RePassword: $("#RePassword").val()
+                        },
+                        success: function (response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'ثبت موفق',
+                                text: 'اطلاعات با موفقیت ثبت شد'
+                            });
+
+                            // پاکسازی فرم یا ریدایرکت
+                            $("#registerForm")[0].reset();
+                        },
+                        error: function (xhr) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'خطا در ثبت',
+                                text: 'مشکلی در ارسال اطلاعات رخ داد'
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
+
+</body>
+</html>
+
+

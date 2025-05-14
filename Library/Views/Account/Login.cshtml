@@ -1,0 +1,140 @@
+﻿@model Application.Dtos.Identity.AuthRequest
+
+@{
+    Layout = null;
+    ViewData["Title"] = "ورود";
+}
+
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <title>ورود به حساب</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+    <!-- Kendo UI CSS -->
+    <link href="https://kendo.cdn.telerik.com/2024.1.319/styles/kendo.default-v2.min.css" rel="stylesheet" />
+</head>
+<body class="bg-light">
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-header bg-success text-white text-center">
+                        <h4 class="mb-0">ورود به حساب</h4>
+                    </div>
+                    <div class="card-body">
+                        <form id="loginForm" dir="rtl">
+                            <div id="validationSummary" class="alert alert-danger d-none"></div>
+
+                            <div class="mb-3">
+                                <label for="PhoneNumber" class="form-label">شماره تلفن</label>
+                                <input id="PhoneNumber" name="PhoneNumber" class="form-control"
+                                       required
+                                       pattern="^(\+98|0)?9\d{9}$"
+                                       data-required-msg="شماره تلفن الزامی است"
+                                       data-pattern-msg="شماره تلفن معتبر نیست" />
+                                <div class="invalid-feedback" id="phoneError"></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="Password" class="form-label">رمز عبور</label>
+                                <input id="Password" name="Password" class="form-control" type="password"
+                                placeholder="رمز عبور شامل اعداد وحروف کوچک انگلیسی"
+                                       required minlength="6"
+                                       data-required-msg="رمز عبور الزامی است"
+                                       data-minlength-msg="رمز عبور باید حداقل 6 کاراکتر باشد" />
+                                <div class="invalid-feedback" id="passwordError"></div>
+                            </div>
+
+                            <div class="form-check mb-3 text-end">
+                                <input id="RememberMe" name="RememberMe" class="form-check-input me-2" type="checkbox" />
+                                <label for="RememberMe" class="form-check-label">مرا به خاطر بسپار</label>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">ورود</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="text-center mt-3">
+                    <a href="/Account/Register" class="text-decoration-none">هنوز ثبت‌نام نکرده‌اید؟ ثبت‌نام</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Kendo UI -->
+    <script src="https://kendo.cdn.telerik.com/2024.1.319/js/kendo.all.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- SweetAlert (اختیاری) -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+               $(document).ready(function () {
+            const validator = $("#loginForm").kendoValidator({
+                messages: {
+                    required: "این فیلد الزامی است",
+                    pattern: "فرمت وارد شده معتبر نیست",
+                    minlength: "رمز عبور باید حداقل 6 کاراکتر باشد"
+                }
+            }).data("kendoValidator");
+
+            $("#loginForm").on("submit", function (e) {
+                e.preventDefault();
+
+                $(".form-control").removeClass("is-invalid");
+                $("#validationSummary").addClass("d-none").text("");
+
+                if (!validator.validate()) {
+                    setTimeout(() => {
+                        $(".k-invalid-msg").css("color", "red !important");
+                    }, 0);
+                    return;
+                }
+
+                const data = {
+                    PhoneNumber: $("#PhoneNumber").val(),
+                    Password: $("#Password").val(),
+                    RememberMe: $("#RememberMe").is(":checked")
+                };
+
+                $.ajax({
+                    url: "/Account/Login",
+                    method: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(data),
+                    success: function (response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'ورود موفق',
+                            text: `خوش آمدید ${response.userName || ''}`
+                        }).then(() => {
+                            window.location.href = "/Book/Booklist";
+                        });
+                    },
+                    error: function (xhr) {
+                        const res = xhr.responseJSON;
+                        $("#validationSummary")
+                            .removeClass("d-none")
+                            .text(res?.error || "خطایی رخ داده است.");
+                    }
+                });
+            });
+        });
+    </script>
+
+
+</body>
+</html>
+
+

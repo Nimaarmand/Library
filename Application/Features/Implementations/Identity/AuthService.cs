@@ -35,8 +35,8 @@ namespace Application.Features.Implementations.Identity
 
             var user = new ApplicationUser
             {
-                FirstName = request.FirstName,
-                LastName = request.LastName,
+                
+               
                 UserName = request.PhoneNumber,
                 Email = $"{Guid.NewGuid()}@example.com",
                 EmailConfirmed = true,
@@ -57,33 +57,77 @@ namespace Application.Features.Implementations.Identity
                 throw new Exception($"{result.Errors}");
             }
         }
+
         public async Task<AuthResponse> Login(AuthRequest request)
         {
-            var user = await _userManager.FindByNameAsync(request.PhoneNumber);
-            if (user == null)
+            try
             {
-                throw new BusinessException(ErrorType.InvalidPhoneNumber);
-            }
-            if (!user.IsActive)
-            {
-                throw new BusinessException(ErrorType.AccountInactive);
-            }
-var result = await _signInManager.PasswordSignInAsync(user.UserName ?? "", request.Password, false, lockoutOnFailure: false);
-                if (!result.Succeeded)
+                // بررسی مقدار ورودی
+                if (string.IsNullOrEmpty(request.PhoneNumber) || string.IsNullOrEmpty(request.Password))
                 {
-                    //throw new BusinessException(ErrorType.InvalidCredentials);
+                    throw new BusinessException(ErrorType.InvalidCredentials);
                 }
 
-            AuthResponse response = new AuthResponse()
-            {
-                Id = user.Id,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                UserName = user.UserName ?? "",
-            };
+                // پیدا کردن کاربر بر اساس شماره تلفن
+                var user = await _userManager.FindByNameAsync(request.PhoneNumber);
+                if (user == null)
+                {
+                    throw new BusinessException(ErrorType.InvalidPhoneNumber);
+                }
 
-            return response;
+                // بررسی فعال بودن حساب کاربر
+                if (!user.IsActive)
+                {
+                    throw new BusinessException(ErrorType.AccountInactive);
+                }
+
+                // بررسی مقدار UserName
+                if (string.IsNullOrEmpty(user.UserName))
+                {
+                    throw new BusinessException(ErrorType.InvalidCredentials);
+                }
+
+                // لاگ‌گذاری مقدار UserName قبل از ورود
+                Console.WriteLine($"UserName: {user.UserName}");
+
+                // تلاش برای ورود کاربر
+                var result = await _signInManager.PasswordSignInAsync(user.UserName, request.Password, request.RememberMe, lockoutOnFailure: true);
+
+                // بررسی نتایج ورود
+                if (!result.Succeeded)
+                {
+                    if (result.IsLockedOut)
+                    {
+                        throw new BusinessException(ErrorType.AccountLocked);
+                    }
+                    else if (result.IsNotAllowed)
+                    {
+                        throw new BusinessException(ErrorType.AccountNotAllowed);
+                    }
+
+                    throw new BusinessException(ErrorType.InvalidCredentials);
+                }
+
+                // ورود موفقیت‌آمیز
+                return new AuthResponse
+                {
+                    Id = user.Id,
+                    UserName = user.UserName
+                };
+            }
+            catch (BusinessException ex)
+            {
+                Console.WriteLine($"BusinessException: {ex.Message}");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unhandled Exception: {ex.Message}");
+                throw new BusinessException(ErrorType.InvalidCredentials);
+            }
         }
+
+
         public async Task Logout()
         {
             await _signInManager.SignOutAsync();
