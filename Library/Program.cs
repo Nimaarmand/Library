@@ -25,7 +25,7 @@ builder.Services.AddScoped<IBookCategories, BookCategoriesService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
-builder.Services.AddScoped<IidentityContext, IdentityContext>();
+
 
 
 

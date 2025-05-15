@@ -37,7 +37,7 @@ namespace Application.Features.Implementations.Books
 
             try
             {
-                await _Context.Books.AddAsync(mappedBook);
+                await _Context.Set<Book>().AddAsync(mappedBook);
                 var result = await _Context.SaveChangesAsync();
 
              
@@ -58,7 +58,7 @@ namespace Application.Features.Implementations.Books
 
         public async Task<List<BookDto>> GetAllBooksAsync()
         {
-            var listbook = await _Context.Books.ToListAsync();
+            var listbook = await _Context.Set<Book>().ToListAsync();
             var books=_mapper.Map <List<BookDto>>(listbook);
             return books;
         }
@@ -70,14 +70,14 @@ namespace Application.Features.Implementations.Books
                 throw new ArgumentNullException(nameof(bookDto), "BookDto نمی‌تواند null باشد.");
             }
 
-            var existingBook = await _Context.Books.FirstOrDefaultAsync(b => b.Id == bookDto.Id);
+            var existingBook = await _Context.Set<Book>().FirstOrDefaultAsync(b => b.Id == bookDto.Id);
             if (existingBook == null)
             {
                 throw new MyArgumentNullException(ErrorType.BookIdNotFound); 
             }
 
             _mapper.Map(bookDto, existingBook);
-            _Context.Books.Update(existingBook);
+            _Context.Set<Book>().Update(existingBook);
             await _Context.SaveChangesAsync();
 
             return Messages.Success();
@@ -85,7 +85,7 @@ namespace Application.Features.Implementations.Books
 
         public async Task<string> RemoveAsync(long bookId)
         {
-            var existingBook = await _Context.Books.FirstOrDefaultAsync(b => b.Id == bookId);
+            var existingBook = await _Context.Set<Book>().FirstOrDefaultAsync(b => b.Id == bookId);
             if (existingBook == null)
             {
                 throw new MyArgumentNullException(ErrorType.BookIdNotFound);
@@ -93,7 +93,7 @@ namespace Application.Features.Implementations.Books
 
             try
             {
-                _Context.Books.Remove(existingBook);
+                _Context.Set<Book>().Remove(existingBook);
                 await _Context.SaveChangesAsync();
 
                 return Messages.Success("کتاب با موفقیت حذف شد.");
@@ -110,7 +110,7 @@ namespace Application.Features.Implementations.Books
                 throw new MyArgumentNullException(ErrorType.InvalidInput);
             }
 
-            var book = await _Context.Books.FindAsync(id);
+            var book = await _Context.Set<Book>().FindAsync(id);
 
             if (book == null) return null;
             var books = _mapper.Map<BookDto>(book);
@@ -119,7 +119,7 @@ namespace Application.Features.Implementations.Books
         }
         public async Task<List<BookDto>> GetAllReservation()
         {         
-            var reservationBooks = await _Context.Books
+            var reservationBooks = await _Context.Set<Book>()
                 .Where(b => b.IsAvailable == true)
                 .ToListAsync();           
             var list = _mapper.Map<List<BookDto>>(reservationBooks);
@@ -129,7 +129,7 @@ namespace Application.Features.Implementations.Books
 
         public async Task<List<BookDto>> GetAllNotReservation()
         {
-            var reservationBooks = await _Context.Books
+            var reservationBooks = await _Context.Set<Book>()
                 .Where(b => b.IsAvailable == false)
                 .ToListAsync();
 

@@ -48,7 +48,7 @@ namespace Application.Features.Implementations.Books
 
             try
             {
-                await _Context.BookCategories.AddAsync(bookCategory);
+                await _Context.Set<BookCategories>().AddAsync(bookCategory);
                 var result = await _Context.SaveChangesAsync();
 
                 // بررسی نتیجه SaveChangesAsync
@@ -72,15 +72,15 @@ namespace Application.Features.Implementations.Books
 
         public async Task<List<BookCategoriesDto>> GetAllCategoriesAsync(long? parentId)
         {
-            var categories = await _Context.BookCategories
+            var categories = await _Context.Set<BookCategories>()
                 .Where(c => c.ParentId == parentId)
                 .Select(c => new BookCategoriesDto
                 {
                     Id = c.Id,
                     Name = c.Name,
                     
-                    ChildNumber = _Context.BookCategories.Count(sub => sub.ParentId == c.Id),
-                    Children = _Context.BookCategories.Where(sub => sub.ParentId == c.Id)
+                    ChildNumber = _Context.Set<BookCategories>().Count(sub => sub.ParentId == c.Id),
+                    Children = _Context.Set<BookCategories>().Where(sub => sub.ParentId == c.Id)
                         .Select(sub => new BookCategoriesDto
                         {
                             Id = sub.Id,
@@ -100,12 +100,12 @@ namespace Application.Features.Implementations.Books
             if (categoriesDto == null)
                 throw new ArgumentNullException(nameof(categoriesDto), "BookCategoriesDto نمی‌تواند null باشد.");
 
-            var existingCategory = await _Context.BookCategories.FirstOrDefaultAsync(c => c.Id == categoriesDto.Id);
+            var existingCategory = await _Context.Set<BookCategories>().FirstOrDefaultAsync(c => c.Id == categoriesDto.Id);
             if (existingCategory == null)
                 return Messages.Error($"دسته‌بندی با شناسه {categoriesDto.Id} یافت نشد.");
 
             _mapper.Map(categoriesDto, existingCategory);
-            _Context.BookCategories.Update(existingCategory);
+            _Context.Set<BookCategories>().Update(existingCategory);
             await _Context.SaveChangesAsync();
 
             return Messages.Success("✅ دسته‌بندی با موفقیت به‌روزرسانی شد.");
@@ -114,13 +114,13 @@ namespace Application.Features.Implementations.Books
 
         public async Task<string> RemoveAsync(long categoryId)
         {
-            var existingCategory = await _Context.BookCategories.FirstOrDefaultAsync(c => c.Id == categoryId);
+            var existingCategory = await _Context.Set<BookCategories>().FirstOrDefaultAsync(c => c.Id == categoryId);
 
             if (existingCategory == null)
                 return Messages.Error($"دسته‌بندی با شناسه {categoryId} یافت نشد.");
 
           
-            _Context.BookCategories.Remove(existingCategory);
+            _Context.Set<BookCategories>().Remove(existingCategory);
 
             await _Context.SaveChangesAsync(); 
 
@@ -131,7 +131,7 @@ namespace Application.Features.Implementations.Books
 
         public async Task<List<BookCategoriesDto>> GetBookCategoriesWithChildrenCountAsync()
         {
-            var bookCategories = await _Context.BookCategories.Include(c => c.Book).ToListAsync();
+            var bookCategories = await _Context.Set<BookCategories>().Include(c => c.Book).ToListAsync();
             return bookCategories.Select(category => new BookCategoriesDto
             {
                 BookId = category.Id,
@@ -148,7 +148,7 @@ namespace Application.Features.Implementations.Books
                 return Messages.Error("عنوان دسته‌بندی نمی‌تواند خالی باشد.");
 
             // دریافت دسته‌بندی والد با استفاده از شناسه موجود در DTO
-            var parentCategory = await _Context.BookCategories
+            var parentCategory = await _Context.Set<BookCategories>()
                 .SingleOrDefaultAsync(c => c.Id == CategoriesDto.ParentId);
 
             if (parentCategory == null)
@@ -160,7 +160,7 @@ namespace Application.Features.Implementations.Books
             
 
 
-            await _Context.BookCategories.AddAsync(newChildCategory);
+            await _Context.Set<BookCategories>().AddAsync(newChildCategory);
             await _Context.SaveChangesAsync();
 
             return Messages.Success("✅ زیرمجموعه با موفقیت ثبت شد.");
@@ -168,7 +168,7 @@ namespace Application.Features.Implementations.Books
 
         public async Task<List<BookCategoriesDto>> GetChildBookCategories(long parentId)
         {
-            var children = await _Context.BookCategories.Where(c => c.Id == parentId).ToListAsync();
+            var children = await _Context.Set<BookCategories>().Where(c => c.Id == parentId).ToListAsync();
             return children.Select(child => new BookCategoriesDto
             {
                 Id = child.Id,
@@ -179,7 +179,7 @@ namespace Application.Features.Implementations.Books
 
         public async Task<List<BookCategoriesDto>> GetBooks(long categoryId)
         {
-            var books = await _Context.Books.Where(b => b.BookCategoriesId == categoryId).ToListAsync();
+            var books = await _Context.Set<Book>().Where(b => b.BookCategoriesId == categoryId).ToListAsync();
             return books.Select(book => new BookCategoriesDto
             {
                 Id = book.BookCategories.Id,
@@ -195,7 +195,7 @@ namespace Application.Features.Implementations.Books
                 throw new MyArgumentNullException(ErrorType.InvalidInput);
             }
 
-            var category = await _Context.BookCategories.FindAsync(id);
+            var category = await _Context.Set<BookCategories>().FindAsync(id);
 
             if (category == null) return null;
             var categorys=_mapper.Map<BookCategoriesDto>(category);

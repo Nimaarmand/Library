@@ -3,6 +3,7 @@ using Application.Dtos.Books;
 using Application.Exceptions.ValidationExceptions;
 using Application.Features.Definitions.Books;
 using Application.Features.Definitions.Contexts;
+using Application.Features.Definitions.Identity;
 using Application.Repositories;
 using AutoMapper;
 using Domain.Entities.Books;
@@ -16,29 +17,30 @@ namespace Application.Features.Implementations.Books
     public class ReservationBookService : IReservationBookService
     {
         private readonly IApplicationDbContext _context;
-        private readonly IidentityContext _Identitycontext;
+        private readonly IUserService _userService;
+       
         private readonly IMapper _mapper;
 
-        public ReservationBookService(IApplicationDbContext context, IMapper mapper, IidentityContext identitycontext)
+        public ReservationBookService(IApplicationDbContext context, IMapper mapper, IUserService userService)
         {
             _context = context;
             _mapper = mapper;
-            _Identitycontext = identitycontext;
+            _userService = userService;
         }
 
-        
+
         public async Task<string> AddReservationAsync(ReservationDto reservationDto)
         {
             if (string.IsNullOrWhiteSpace(reservationDto.UserId) || reservationDto.BookId <= 0)
                 throw new MyArgumentNullException(ErrorType.InvalidInput);
 
             
-            var user = await _Identitycontext.Users.FindAsync(reservationDto.UserId);
+            var user = await _userService.GetUserByUserId(reservationDto.UserId);
             if (user == null)
                 return "کاربر موردنظر یافت نشد.";
 
           
-            var book = await _context.Books
+            var book = await _context.Set<Book>()
                 .Include(b => b.Reservations) 
                 .FirstOrDefaultAsync(b => b.Id == reservationDto.BookId);
 
@@ -66,11 +68,18 @@ namespace Application.Features.Implementations.Books
             book.Reservations.Add(reservation);
 
            
-            _context.Reservations.Add(reservation);
-            _context.Books.Update(book);
+            _context.Set<Reservation>().Add(reservation);
+            _context.Set<Book>().Update(book);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
 
-            
-            await _context.SaveChangesAsync();
+            }
+
+           
 
             return Messages.Success("رزرو با موفقیت انجام شد");
         }
@@ -82,21 +91,21 @@ namespace Application.Features.Implementations.Books
                 throw new MyArgumentNullException(ErrorType.InvalidInput);
 
             
-            var reservation = await _context.Reservations.FindAsync(id);
+            var reservation = await _context.Set<Reservation>().FindAsync(id);
             if (reservation == null)
                 throw new MyArgumentNullException(ErrorType.ReservationIdNotFound);
 
           
-            var book = await _context.Books.FindAsync(reservation.BookId);
+            var book = await _context.Set<Book>().FindAsync(reservation.BookId);
             if (book != null)
             {
                 
                 book.IsAvailable = false;
-                _context.Books.Update(book);
+                _context.Set<Book>().Update(book);
             }
 
           
-            _context.Reservations.Remove(reservation);
+            _context.Set<Reservation>().Remove(reservation);
             await _context.SaveChangesAsync();
 
             return Messages.Success("رزرو کنسل شد");
@@ -105,9 +114,8 @@ namespace Application.Features.Implementations.Books
        
         public async Task<IEnumerable<Reservation>> GetAllBooksAsync(CancellationToken cancellationToken = default)
         {
-            return await _context.Reservations
-                .Include(r => r.Book) 
-                .Include(r => r.User)  
+            return await _context.Set<Reservation>()
+                .Include(r => r.Book)                  
                 .ToListAsync(cancellationToken);
         }
 
@@ -115,12 +123,12 @@ namespace Application.Features.Implementations.Books
         public async Task AutoReleaseExpiredReservationsAsync()
         {
             var now = DateTime.Now;
-            var expiredReservations = await _context.Reservations
+            var expiredReservations = await _context.Set<Reservation>()
                 .Where(r => r.ExpirationDate < now) 
                 .ToListAsync();
 
             var bookIds = expiredReservations.Select(r => r.BookId).Distinct().ToList();
-            var books = await _context.Books
+            var books = await _context.Set<Book>()
                 .Where(b => bookIds.Contains(b.Id))
                 .ToListAsync();
 
@@ -131,11 +139,11 @@ namespace Application.Features.Implementations.Books
                 {
                   
                     book.IsAvailable = false;  
-                    _context.Books.Update(book);
+                    _context.Set<Book>().Update(book);
                 }
 
              
-                _context.Reservations.Remove(reservation);
+                _context.Set<Reservation>().Remove(reservation);
             }
 
             await _context.SaveChangesAsync();

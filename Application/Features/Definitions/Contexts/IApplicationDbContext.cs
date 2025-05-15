@@ -12,14 +12,6 @@ namespace Application.Features.Definitions.Contexts
         DbContext Context { get; }
         DatabaseFacade Database { get; }
         DbSet<TEntity> Set<TEntity>() where TEntity : class;
-         DbSet<BookCategories> BookCategories { get; set; }
-        public DbSet<Book> Books { get; set; }
-        DbSet<Deliverys> Deliveries { get; set; }
-         DbSet<DeliveryStatus> DeliveryStatus { get; set; }
-         DbSet<Reservation> Reservations { get; set; }
-        
-
-
 
 
         int SaveChanges();

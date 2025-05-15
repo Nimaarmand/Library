@@ -1,6 +1,7 @@
 ﻿using Application.Features.Definitions.Contexts;
 using Domain.Entities.Books;
 using Domain.Entities.Reservations;
+using Domain.Entities.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Persistence.Configurations.ApplicationConfigurations;
@@ -13,7 +14,7 @@ namespace Persistence.Contexts
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
         public DbContext Context => this;
         public DatabaseFacade Database => base.Database;
-
+        public DbSet<ProfileUser> ProfileUser { get; set; }
         public DbSet<Book> Books { get; set; }
 
         public DbSet<BookCategories> BookCategories { get; set; }
@@ -23,7 +24,7 @@ namespace Persistence.Contexts
         public DbSet<Reservation> Reservations { get; set; }
 
 
-
+        
         protected override void OnModelCreating(ModelBuilder builder)
         {
             #region Schema Sql
