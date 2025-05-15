@@ -1,16 +1,20 @@
-﻿using Domain.Entities.Commons;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Domain.Entities.Users
+namespace Application.Dtos.Identity.UserProfile
 {
-    public class UserProfile : BaseEntityNotId
+    public class UserProfileDto
     {
-        public long Id { get; set; }
+        public string Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string NationalCode { get; set; }
         public string Phone { get; set; }
         public string Address { get; set; }
         public string ImagePath { get; set; }
-        public DateTime BirthDate { get; set; }
+        public string BirthDate { get; set; }
     }
 }

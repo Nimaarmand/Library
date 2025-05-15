@@ -11,6 +11,8 @@ namespace Application.Features.Definitions.Books
         Task<string> AddAsync(BookDto book);
         Task<BookDto> FindAsync(long id);
         public Task<List<BookDto>> GetAllBooksAsync();
+        public Task<List<BookDto>> GetAllReservation();
+        public Task<List<BookDto>> GetAllNotReservation();
         Task<string> UpdateAsync(BookDto bookDto);
         Task<string> RemoveAsync(long bookId);
     }

@@ -33,7 +33,10 @@ namespace Domain.Enumorations
         InvalidCredentials = 1012,
         [Description("حساب کاربری شما قفل شده است")]
         AccountLocked = 1013,
-
-        AccountNotAllowed = 1014
+        AccountNotAllowed = 1014,
+        [Description("شماره تلفن یافت نشد ")]
+        PhoneNumberNotFound = 1015,
+        [Description("خطا در تغیر پسورد")]
+        ErrorChangeNewPassword = 1016
     }
 }

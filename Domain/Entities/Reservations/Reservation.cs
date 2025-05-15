@@ -1,5 +1,6 @@
 ﻿using Domain.Entities.Books;
 using Domain.Entities.Commons;
+using Domain.Entities.Users;
 
 namespace Domain.Entities.Reservations
 {
@@ -7,15 +8,10 @@ namespace Domain.Entities.Reservations
     {
         public DateTime ReservationDate { get; set; }
         public DateTime ExpirationDate { get; set; }
-
-        // ارتباط مستقیم با کاربر
-        public string UserId { get; set; }
-
-        // ارتباط مستقیم با کتاب
+        public string UserId { get; set; }    
+        public ApplicationUser User { get; set; }     
         public long BookId { get; set; }
-        public virtual Book Book { get; set; }
-
-        // ارتباط مستقیم با وضعیت تحویل
+        public virtual Book Book { get; set; }    
         public virtual ICollection<DeliveryStatus> DeliveryStatuses { get; set; } = new List<DeliveryStatus>();
     }
 

@@ -2,8 +2,10 @@
 using Application.Features.Definitions.Books;
 using Application.Features.Definitions.Contexts;
 using Application.Features.Definitions.Identity;
+using Application.Features.Definitions.Userprofile;
 using Application.Features.Implementations.Books;
 using Application.Features.Implementations.Identity;
+using Application.Features.Implementations.UserProfile;
 using Application.MappingProfile;
 using Application.Repositories;
 using Domain.Entities.Books;
@@ -21,6 +23,9 @@ builder.Services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IBookCategories, BookCategoriesService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+builder.Services.AddScoped<IidentityContext, IdentityContext>();
 
 
 
@@ -46,6 +51,7 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddAutoMapper(typeof(BookProfile));
 builder.Services.AddAutoMapper(typeof(ReservationProfile));
+builder.Services.AddAutoMapper(typeof(Userprofile));
 // اضافه کردن Hangfire
 builder.Services.AddHangfire(config => config
     .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)

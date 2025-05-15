@@ -1,4 +1,5 @@
-﻿using Domain.Entities.Users;
+﻿using Application.Features.Definitions.Contexts;
+using Domain.Entities.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -6,11 +7,12 @@ using Persistence.Configurations.IdentityConfigurations;
 using Persistence.Seeds.IdentitySeed;
 
 
-public class IdentityContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>
+public class IdentityContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>, IidentityContext
 {
     public IdentityContext(DbContextOptions<IdentityContext> options) : base(options) { }
 
- 
+    public DbSet<ProfileUser> UserProfiles { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder); // این را فراموش نکن

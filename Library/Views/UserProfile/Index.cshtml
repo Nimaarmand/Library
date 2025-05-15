@@ -1,0 +1,65 @@
+﻿@using Application.Dtos.Identity.UserProfile
+@model UserProfileDto
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>پروفایل</title>
+</head>
+<body>
+    <h2>نمایش پروفایل</h2>
+
+    <table class="table">
+        <tr>
+            <th>کد کاربر</th>
+            <td>@Model.Id</td>
+        </tr>
+        <tr>
+            <th>نام</th>
+            <td>@Model.FirstName</td>
+        </tr>
+        <tr>
+            <th>نام خانوادگی</th>
+            <td>@Model.LastName</td>
+        </tr>
+        <tr>
+            <th>کد ملی</th>
+            <td>@Model.NationalCode</td>
+        </tr>
+        <tr>
+            <th>شماره تلفن</th>
+            <td>@Model.Phone</td>
+        </tr>
+        <tr>
+            <th>آدرس</th>
+            <td>@Model.Address</td>
+        </tr>
+        <tr>
+            <th>تاریخ تولد</th>
+            <td>@Model.BirthDate</td>
+        </tr>
+        <tr>
+            <th>تصویر</th>
+            <td>
+                @if (!string.IsNullOrEmpty(Model.ImagePath))
+                {
+                    <img src="@Url.Content("~/uploads/" + Model.ImagePath)" alt="عکس پروفایل" width="100" />
+                }
+                else
+                {
+                    <span>بدون تصویر</span>
+                }
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        <a asp-action="Edit" asp-route-id="@Model.Id">ویرایش</a> |
+        <a asp-action="Delete" asp-route-id="@Model.Id">حذف</a>
+    </p>
+</body>
+</html> 

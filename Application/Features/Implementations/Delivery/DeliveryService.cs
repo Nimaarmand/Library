@@ -6,7 +6,7 @@ using AutoMapper;
 using Domain.Entities.Books;
 using Domain.Entities.Reservations;
 
-namespace Application.Features.Implementations.Deliverys
+namespace Application.Features.Implementations.Delivery
 {
     public class DeliveryService : IDeliveryService
     {
@@ -35,7 +35,7 @@ namespace Application.Features.Implementations.Deliverys
                 }
 
                 // ثبت تحویل جدید
-                var delivery = _mapper.Map<Domain.Entities.Reservations.Deliverys>(deliveryDto);
+                var delivery = _mapper.Map<Deliverys>(deliveryDto);
                 delivery.DeliveryTime = DateTime.Now;
 
                 await _repository.AddAsync(delivery);
@@ -105,7 +105,7 @@ namespace Application.Features.Implementations.Deliverys
                 }
 
                 // ثبت تحویل کتاب برای کاربر
-                var delivery = new Domain.Entities.Reservations.Deliverys
+                var delivery = new Deliverys
                 {
                     UserId = reservation.UserId,
                     BookId = reservation.BookId,

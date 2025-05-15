@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.Identity;
+using Application.Dtos.Identity.UserProfile;
 using Application.Exceptions.BusinessExceptions;
 using Application.Features.Definitions.Identity;
 using Microsoft.AspNetCore.Http;
@@ -10,9 +11,26 @@ namespace Library.Controllers
     public class AccountController : Controller
     {
         private readonly IAuthService _authService;
-        public AccountController(IAuthService authService)
+        private readonly IUserService _userService;
+        public AccountController(IAuthService authService, IUserService userService)
         {
             _authService = authService;
+            _userService = userService;
+        }
+        public async Task<IActionResult> ListUser()
+        {
+            var users = await _userService.GetAllUsers();
+            return View(users); 
+        }
+        [HttpGet]
+        public IActionResult UserProfile()
+        {
+            return View();
+        }
+        [HttpPost]
+        public IActionResult UserProfile(UserProfileDto userProfileDto)
+        {
+            return View();
         }
         [HttpGet]
         public IActionResult Login()
@@ -63,28 +81,54 @@ namespace Library.Controllers
             }
         }
 
-      
-        public ActionResult Edit(int id)
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(string phoneNumber)
         {
-            return View();
+            var user = await _userService.GetUserByPhoneNumber(phoneNumber);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var model = new RegisterationRequest
+            {
+                PhoneNumber = user.PhoneNumber,
+               
+               
+            };
+
+            return View(model);
         }
+
 
         [HttpPost]
-      
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<IActionResult> Edit(string phoneNumber, RegisterationRequest request)
         {
+            if (!ModelState.IsValid)
+            {
+                return Json(new { success = false, message = "اطلاعات وارد شده نامعتبر است." });
+            }
+
             try
             {
-                return RedirectToAction(nameof(Index));
+                await _userService.UpdateUser(phoneNumber, request);
+                return Json(new { success = true, message = "اطلاعات با موفقیت به‌روزرسانی شد." });
             }
-            catch
+            catch (BusinessException ex)
             {
-                return View();
+                return Json(new { success = false, message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return Json(new { success = false, message = "خطایی در سرور رخ داد." });
             }
         }
 
-      
-        public ActionResult Delete(int id)
+
+
+
+        public IActionResult Delete(int id)
         {
             return View();
         }

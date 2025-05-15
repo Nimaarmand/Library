@@ -1,15 +1,20 @@
-﻿using Application.Features.Implementations.Books;
+﻿using Application.Features.Definitions.Books;
+using Application.Features.Implementations.Books;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Stimulsoft.Report;
+using System.IO;
 
 namespace Library.Controllers
 {
     public class ReportController : Controller
     {
-        private readonly BookService _bookService;
-        public ReportController(BookService bookService)
+        private readonly IBookService _bookService;
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public ReportController(IBookService bookService, IWebHostEnvironment webHostEnvironment)
         {
             _bookService = bookService;
+            _webHostEnvironment = webHostEnvironment;
         }
         // GET: ReportController
         public IActionResult Index()
@@ -23,8 +28,10 @@ namespace Library.Controllers
         }
         public IActionResult GetReportBook()
         {
+            string directoryPath = Path.Combine(_webHostEnvironment.WebRootPath, $@"Reports/Book/Book.mrt");
             StiReport report = new StiReport();
-            report.Load("wwwroot/Reports/BookReport.mrt");
+           
+            report.Load(directoryPath);
 
             var books = _bookService.GetAllBooksAsync().Result
                 .Select(b => new

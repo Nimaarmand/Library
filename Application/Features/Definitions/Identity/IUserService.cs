@@ -7,6 +7,7 @@ namespace Application.Features.Definitions.Identity
     public interface IUserService
     {
         Task<string> GetFullNameUser(string userId);
+        Task<List<ApplicationUser>> GetAllUsers();
         Task<ApplicationUser> GetUserByUserId(string userId);
         Task<ApplicationUser> GetUserByPhoneNumber(string phoneNumber);
         Task<RegistrationResponse> UpdateUser(string phone, RegisterationRequest request);

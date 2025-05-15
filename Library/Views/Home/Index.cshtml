@@ -42,9 +42,10 @@
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" asp-controller="Account" asp-action="Register">ثبت‌نام</a></li>
                             <li><a class="dropdown-item" asp-controller="Account" asp-action="Login">ورود</a></li>
-
-                            <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile">تکمیل حساب کاربری</a></li>
+                            <li><a class="dropdown-item" asp-controller="UserProfile" asp-action="Create">تکمیل حساب کاربری</a></li>
+                            <li><a class="dropdown-item" asp-controller="UserProfile" asp-action="Index">حساب من</a></li>
                             <li><a class="dropdown-item" asp-controller="Account" asp-action="Logout">خروج از حساب</a></li>
+                            <li><a class="dropdown-item" asp-controller="Account" asp-action="ListUser">لیست کاربران </a></li>
                         </ul>
                     </li>
 
@@ -55,19 +56,40 @@
 
                             <li>
                                 <a class="dropdown-item" href="~/Book/Create">
-                                    <i class="bi bi-book"></i> ثبت کتاب‌ها
+                                     ثبت کتاب‌ها
                                 </a>
                             </li>
 
                             <li>
                                 <a class="dropdown-item" href="~/Book/Booklist">
-                                    <i class="bi bi-eye"></i> لیست کتاب‌ها
+                                    لیست کتاب‌ها
                                 </a>
                             </li>
                          
                           
                         </ul>
                     </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">رزروکتاب‌</a>
+                        <ul class="dropdown-menu">
+
+                            <li>
+                                <a class="dropdown-item" href="~/Reservation/GetAllBookNotReservation">
+                                     کتاب های آزاد
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="dropdown-item" href="~/Reservation/GetAllBookReservation">
+                                     کتاب های رزرو شده
+                                </a>
+                            </li>
+
+
+                        </ul>
+                    </li>
+
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">مدیریت دسته بندی ها‌</a>
                         <ul class="dropdown-menu">  
@@ -79,7 +101,7 @@
                         <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">گزارشات‌</a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="#">کاربران</a></li>
-                            <li><a class="dropdown-item" href="#"> گزارش کتاب ها</a></li>
+                            <li><a class="dropdown-item" href="~/Report/GetReportBook"> گزارش کتاب ها</a></li>
                             <li><a class="dropdown-item" href="#"> گزارش رزرو ها </a></li>
                             <li><a class="dropdown-item" href="#"> </a></li>
                         </ul>

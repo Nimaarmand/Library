@@ -17,6 +17,7 @@ namespace Application.Features.Definitions.Books
         Task<string> AddChildAsync(BookCategoriesDto bookCategoriesDto);
         Task<BookCategoriesDto> FindAsync(long id);
         public Task<List<BookCategoriesDto>> GetAllCategoriesAsync(long? parentId );
+       
         Task<string> UpdateAsync(BookCategoriesDto  categoriesDto);
         Task<string> RemoveAsync(long bookId);
     }

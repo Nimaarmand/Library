@@ -4,6 +4,7 @@ using Application.Exceptions.BusinessExceptions;
 using Application.Features.Definitions.Identity;
 using Domain.Entities.Users;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Implementations.Identity
 {
@@ -33,19 +34,19 @@ namespace Application.Features.Implementations.Identity
             var user = await _userManager.FindByNameAsync(request.PhoneNumber);
             if (user == null)
             {
-               // throw new BusinessException(ErrorType.PhoneNumberNotFound);
+                throw new BusinessException(ErrorType.PhoneNumberNotFound);
             }
 
             var result = await _userManager.RemovePasswordAsync(user);
             if (!result.Succeeded)
             {
-                //throw new BusinessException(ErrorType.ErrorChangeNewPassword);
+                throw new BusinessException(ErrorType.ErrorChangeNewPassword);
             }
 
             result = await _userManager.AddPasswordAsync(user, request.NewPassword);
             if (!result.Succeeded)
             {
-                //throw new BusinessException(ErrorType.ErrorChangeNewPassword);
+                throw new BusinessException(ErrorType.ErrorChangeNewPassword);
             }
 
             return new PasswordResponse { Success = true, Message = "Password changed successfully." };
@@ -94,8 +95,8 @@ namespace Application.Features.Implementations.Identity
         {
             var user = await _userManager.FindByNameAsync(phone);
             if (user == null)
-            {
-                //throw new BusinessException(ErrorType.PhoneNumberNotFound);
+            {                           
+                throw new BusinessException(ErrorType.PhoneNumberNotFound);
             }
 
             if (!string.IsNullOrEmpty(request.PhoneNumber) && request.PhoneNumber != user.UserName)
@@ -110,10 +111,7 @@ namespace Application.Features.Implementations.Identity
                 user.PhoneNumber = request.PhoneNumber;
             }
 
-            //user.FirstName = request.FirstName ?? user.FirstName;
-            //user.LastName = request.LastName ?? user.LastName;
-            //user.ConcurrencyStamp = Guid.NewGuid().ToString();
-
+            
             var updateResult = await _userManager.UpdateAsync(user);
             if (updateResult.Succeeded)
             {
@@ -126,7 +124,11 @@ namespace Application.Features.Implementations.Identity
                 throw new Exception($"Error updating user: {string.Join(", ", updateResult.Errors.Select(e => e.Description))}");
             }
         }
-      
-        
+
+        public async Task<List<ApplicationUser>> GetAllUsers()
+        {
+            return await _userManager.Users.ToListAsync();
+        }
+
     }
 }

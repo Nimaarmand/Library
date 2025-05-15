@@ -3,7 +3,7 @@ using Domain.Entities.Reservations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Domain.Entities.Reservations;
+using Domain.Entities.Users;
 
 namespace Application.Features.Definitions.Contexts
 {
@@ -17,7 +17,7 @@ namespace Application.Features.Definitions.Contexts
         DbSet<Deliverys> Deliveries { get; set; }
          DbSet<DeliveryStatus> DeliveryStatus { get; set; }
          DbSet<Reservation> Reservations { get; set; }
-
+        
 
 
 

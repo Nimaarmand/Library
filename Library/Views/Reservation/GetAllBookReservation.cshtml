@@ -3,6 +3,7 @@
 @{
     Layout = null;
 }
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,7 +27,7 @@
 
 <body>
     <div class="container mt-3">
-        <h2 class="text-center">لیست کتاب ها</h2>
+        <h2 class="text-center">کتاب های رزرو شده</h2>
         <div class="mb-3" dir="rtl">
             <div class="input-group">
                 <input type="text" class="form-control" id="searchInput" placeholder="جستجو کنید..." aria-label="جستجو" aria-describedby="searchIcon">
@@ -43,9 +44,9 @@
                     <th>ناشر</th>
                     <th>زبان</th>
                     <th>تاریخ انتشار</th>
-                     <th> وضعیت کتاب</th>
+                     <th hidden> وضعیت کتاب</th>
                      <th hidden> بارکد </th>
-                     <th>عملیات</th>
+                     <th hidden>عملیات</th>
                 </tr>
             </thead>
             <tbody>
@@ -59,16 +60,32 @@
                         <td>@item.Publisher</td>
                         <td>@item.Language</td>
                         <td>@item.PublicationDate</td>
-                        <td>@item.IsAvailable</td>
+                        <td hidden>@item.IsAvailable</td>
                         <td hidden>@item.ISBN</td>
-                        <td>
+                        <td hidden>
 
-                            <div class="dropdown">
+                            <div class="dropdown" hidden>
                                 <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                                     عملیات
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                                  
+
+
+                                  
+                                      <li>
+                                                <a href="#" class="dropdown-item btn-add-sub" data-id="@item.Id">
+                                                           <i class="fas fa-plus"></i> رزرو کتاب
+                                                </a>
+                                      </li>
+
+
+
+                                    <li>
+                                       <a class="dropdown-item btn-show-sub" href="#" data-id="@item.Id">
+                                            <i class="fas fa-eye"></i> نمایش زیر مجموعه
+                                       </a>
+                                    </li> 
+
                                     <li>
                                                 <a class="dropdown-item btn-edit" href="#" data-id="@item.Id">
                                                       <i class="fas fa-edit"></i> ویرایش
@@ -211,3 +228,4 @@
 </body>
 
 </html>
+

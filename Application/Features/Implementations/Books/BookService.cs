@@ -7,6 +7,7 @@ using Application.Repositories;
 using AutoMapper;
 using Domain.Entities.Books;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace Application.Features.Implementations.Books
 {
@@ -116,5 +117,26 @@ namespace Application.Features.Implementations.Books
             return books;
 
         }
+        public async Task<List<BookDto>> GetAllReservation()
+        {         
+            var reservationBooks = await _Context.Books
+                .Where(b => b.IsAvailable == true)
+                .ToListAsync();           
+            var list = _mapper.Map<List<BookDto>>(reservationBooks);
+
+            return list;
+        }
+
+        public async Task<List<BookDto>> GetAllNotReservation()
+        {
+            var reservationBooks = await _Context.Books
+                .Where(b => b.IsAvailable == false)
+                .ToListAsync();
+
+            var list = _mapper.Map<List<BookDto>>(reservationBooks);
+
+            return list;
+        }
+
     }
 }

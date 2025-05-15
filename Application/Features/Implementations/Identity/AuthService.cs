@@ -62,38 +62,37 @@ namespace Application.Features.Implementations.Identity
         {
             try
             {
-                // بررسی مقدار ورودی
+              
                 if (string.IsNullOrEmpty(request.PhoneNumber) || string.IsNullOrEmpty(request.Password))
                 {
                     throw new BusinessException(ErrorType.InvalidCredentials);
                 }
 
-                // پیدا کردن کاربر بر اساس شماره تلفن
                 var user = await _userManager.FindByNameAsync(request.PhoneNumber);
                 if (user == null)
                 {
                     throw new BusinessException(ErrorType.InvalidPhoneNumber);
                 }
 
-                // بررسی فعال بودن حساب کاربر
+               
                 if (!user.IsActive)
                 {
                     throw new BusinessException(ErrorType.AccountInactive);
                 }
 
-                // بررسی مقدار UserName
+               
                 if (string.IsNullOrEmpty(user.UserName))
                 {
                     throw new BusinessException(ErrorType.InvalidCredentials);
                 }
 
-                // لاگ‌گذاری مقدار UserName قبل از ورود
+                
                 Console.WriteLine($"UserName: {user.UserName}");
 
-                // تلاش برای ورود کاربر
+             
                 var result = await _signInManager.PasswordSignInAsync(user.UserName, request.Password, request.RememberMe, lockoutOnFailure: true);
 
-                // بررسی نتایج ورود
+              
                 if (!result.Succeeded)
                 {
                     if (result.IsLockedOut)
@@ -108,7 +107,7 @@ namespace Application.Features.Implementations.Identity
                     throw new BusinessException(ErrorType.InvalidCredentials);
                 }
 
-                // ورود موفقیت‌آمیز
+               
                 return new AuthResponse
                 {
                     Id = user.Id,

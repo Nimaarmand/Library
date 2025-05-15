@@ -1,32 +1,25 @@
-﻿@model IEnumerable<Application.Dtos.Books.BookDto>
+﻿@using Domain.Entities.Users
+@model List<ApplicationUser>
 
 @{
-    Layout = null;
+    ViewData["Title"] = "لیست کاربران";
 }
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <title>Bootstrap Example</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-
-    <!-- jQuery -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
 </head>
-
-
 <body>
     <div class="container mt-3">
-        <h2 class="text-center">لیست کتاب ها</h2>
+        <h2 class="text-center">لیست کاربران</h2>
         <div class="mb-3" dir="rtl">
             <div class="input-group">
                 <input type="text" class="form-control" id="searchInput" placeholder="جستجو کنید..." aria-label="جستجو" aria-describedby="searchIcon">
@@ -37,15 +30,10 @@
             <thead>
                 <tr>
                     <th hidden>  id</th>
-                    <th>نام کتاب</th>
-                    <th>موضوع</th>
-                    <th>نویسنده</th>                  
-                    <th>ناشر</th>
-                    <th>زبان</th>
-                    <th>تاریخ انتشار</th>
-                     <th> وضعیت کتاب</th>
-                     <th hidden> بارکد </th>
-                     <th>عملیات</th>
+                    <th>نام کاربری</th>
+                    <th>شماره تلفن</th>
+                    <th>وضعیت</th>
+                    <th>عملیات</th>
                 </tr>
             </thead>
             <tbody>
@@ -53,14 +41,9 @@
                 {
                     <tr>
                         <td hidden>@item.Id</td hidden>
-                        <td>@item.Name</td>
-                        <td>@item.Subject</td>
-                        <td>@item.Author</td>
-                        <td>@item.Publisher</td>
-                        <td>@item.Language</td>
-                        <td>@item.PublicationDate</td>
-                        <td>@item.IsAvailable</td>
-                        <td hidden>@item.ISBN</td>
+                        <td>@item.UserName</td>
+                        <td>@item.PhoneNumber</td>
+                        <td>@item.IsActive</td>
                         <td>
 
                             <div class="dropdown">
@@ -68,9 +51,25 @@
                                     عملیات
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                                  
+
+
+                                  
+                                      <li>
+                                                <a href="#" class="dropdown-item btn-add-sub" data-id="@item.Id">
+                                                           <i class="fas fa-plus"></i> ثبت زیر مجموعه
+                                                </a>
+                                      </li>
+
+
+
                                     <li>
-                                                <a class="dropdown-item btn-edit" href="#" data-id="@item.Id">
+                                       <a class="dropdown-item btn-show-sub" href="#" data-id="@item.Id">
+                                            <i class="fas fa-eye"></i> نمایش زیر مجموعه
+                                       </a>
+                                    </li> 
+
+                                    <li>
+                                                <a class="dropdown-item btn-edit" href="#" data-id="@item.PhoneNumber">
                                                       <i class="fas fa-edit"></i> ویرایش
                                                 </a>
                                     </li>
@@ -118,7 +117,7 @@
         });
 
         $(document).ready(function () {
-            // Delete 
+            // Delete category
             $(".delete-category").click(function (e) {
                 e.preventDefault();
 
@@ -137,7 +136,7 @@
                     if (result.isConfirmed) {
                         $.ajax({
                             type: "POST",
-                            url: "/Books/Delete",
+                            url: "/Category/Delete",
                             data: { id: categoryId },
                             success: function (response) {
                                 if (response.success) {
@@ -169,7 +168,18 @@
             });
         });
 
-        
+           $(document).ready(function () {
+         $(".btn-add-sub").click(function (e) {
+                      e.preventDefault();
+
+                   var parentId = $(this).data("id"); 
+                          if (parentId && parentId != 0) {
+                      window.location.href = "/Category/AddSubCategory?parentid=" + parentId; 
+                } else {
+                       alert("ID معتبر نیست!");
+                }
+         });
+         });
      
          $(document).ready(function () {
          $(".btn-show-sub").click(function (e) {
@@ -189,18 +199,19 @@
          });
 
         $(document).ready(function () {
-       $(".btn-edit").click(function (e) {
+    $(".btn-edit").click(function (e) {
         e.preventDefault();
 
-        var bookId = $(this).data("id"); // اطمینان از اینکه ID درست دریافت می‌شود
-        if (bookId) {
-            window.location.href = "/Book/Edit/" + bookId;
+        var phoneNumber = $(this).data("id");
 
+        if (phoneNumber) {
+            // اصلاح مسیر برای کنترلر Account و پارامتر phoneNumber
+            window.location.href = "/Account/Edit?phoneNumber=" + phoneNumber;
         } else {
             Swal.fire({
                 icon: "error",
                 title: "خطا!",
-                text: "شناسه کتاب نامعتبر است."
+                text: "شماره تلفن نامعتبر است."
             });
         }
     });
@@ -211,3 +222,4 @@
 </body>
 
 </html>
+
