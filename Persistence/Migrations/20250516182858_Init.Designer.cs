@@ -8,11 +8,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Persistence.Migrations.Identity
+namespace Persistence.Migrations
 {
     [DbContext(typeof(IdentityContext))]
-    [Migration("20250515204216_identity")]
-    partial class identity
+    [Migration("20250516182858_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

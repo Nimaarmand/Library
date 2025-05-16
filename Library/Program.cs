@@ -1,9 +1,11 @@
 ﻿
 using Application.Features.Definitions.Books;
 using Application.Features.Definitions.Contexts;
+using Application.Features.Definitions.Delivery;
 using Application.Features.Definitions.Identity;
 using Application.Features.Definitions.Userprofile;
 using Application.Features.Implementations.Books;
+using Application.Features.Implementations.Delivery;
 using Application.Features.Implementations.Identity;
 using Application.Features.Implementations.UserProfile;
 using Application.MappingProfile;
@@ -24,6 +26,7 @@ builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IBookCategories, BookCategoriesService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IDeliveryService, DeliveryService>();
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 
 

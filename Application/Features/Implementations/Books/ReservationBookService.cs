@@ -41,39 +41,38 @@ namespace Application.Features.Implementations.Books
                 return "کاربر موردنظر یافت نشد.";
             reservationDto.UserName = user.UserName;
             // دریافت اطلاعات کتاب
-            var book = await _context.Set<Book>()
-                .Include(b => b.Reservations)
-                .FirstOrDefaultAsync(b => b.Id == reservationDto.BookId);
-           
+            var book = await _context.Set<Book>().FindAsync(reservationDto.BookId);
+            
             if (book == null)
             {
                 throw new MyArgumentNullException(ErrorType.BookIdNotFound);
             }
 
-            // بررسی وضعیت دسترسی کتاب
-            if (book.IsAvailable==true) // اگر کتاب در دسترس نیست، نمی‌توان آن را رزرو کرد
+          
+            if (book.IsAvailable==true) 
             {
                 throw new MyArgumentNullException(ErrorType.IsAvailable);
             }
 
-            // ایجاد رزرو جدید
-            var reservation = _mapper.Map<Reservation>(reservationDto);
+            var reservation=new Reservation();
+            reservation.ReservationDate = reservationDto.ReservationDate;
+            reservation.UserName = reservationDto.UserName;
+            reservation.UserId=user.Id;
             reservation.ExpirationDate = DateTime.Now.AddDays(3);
+            reservation.BookId= reservationDto.BookId;
+         
+           // book.Reservations.Add(reservation);
 
-            // اضافه کردن رزرو به لیست رزرو‌های کتاب
-            book.Reservations ??= new List<Reservation>();
-            book.Reservations.Add(reservation);
-
-            // تغییر وضعیت کتاب به "رزرو شده"
+          
             book.IsAvailable = true;
 
-            // تراکنش برای جلوگیری از خطا
+           
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    _context.Set<Reservation>().Add(reservation);
                     _context.Set<Book>().Update(book);
+                    _context.Set<Reservation>().Add(reservation);
 
                     // ذخیره تغییرات در پایگاه داده
                     await _context.SaveChangesAsync();

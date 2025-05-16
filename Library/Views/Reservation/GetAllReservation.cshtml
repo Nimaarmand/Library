@@ -67,14 +67,11 @@
 
                                   
                                    <li>
-                                                  <a href="#" class="dropdown-item btn-add-sub" data-id="@item.Id">
+                                      <a href="#" class="dropdown-item btn-add-sub" data-id="@item.Id">
                                                          <i class="fas fa-plus"></i> تحویل کتاب به کاربر
-                                                    </a>
-                                    </li>
+                                       </a>
+                                   </li>
  
-
-
-
                                     <li>
                                        <a class="dropdown-item btn-show-sub" href="#" data-id="@item.Id">
                                             <i class="fas fa-eye"></i> نمایش زیر مجموعه
@@ -110,17 +107,46 @@
 
 
  <script>
-    $(document).ready(function () {
-      
-        $("#searchInput").on("keyup", function () {
-            var input = $(this).val().toLowerCase();
-            $("#dataTable tr").each(function (index) {
-                if (index === 0) return; 
-                var found = $(this).text().toLowerCase().includes(input);
-                $(this).toggle(found);
-            });
+   $(document).ready(function () {
+    
+    $("#searchInput").on("keyup", function () {
+        var input = $(this).val().toLowerCase();
+        $("#dataTable tr").each(function (index) {
+            if (index === 0) return;
+            var found = $(this).text().toLowerCase().includes(input);
+            $(this).toggle(found);
         });
     });
+ 
+    $(".btn-add-sub").click(function (e) {
+        e.preventDefault();
+        var reservId = $(this).data("id");
+
+        $.ajax({
+            url: "/Delivery/ReservationDelivery",
+            type: "POST",
+            data: { id: reservId },
+            success: function (response) {
+                Swal.fire({
+                    title: "موفقیت!",
+                    text: response,
+                    icon: "success",
+                    timer: 2000
+                }).then(() => {
+                    location.reload();
+                });
+            },
+            error: function (xhr) {
+                Swal.fire({
+                    title: "خطا!",
+                    text: xhr.responseText,
+                    icon: "error",
+                    confirmButtonText: "متوجه شدم"
+                });
+            }
+        });
+    });
+});
 </script>
 
 
@@ -129,71 +155,4 @@
 
 </html>
 
-@* <!DOCTYPE html>
-
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>GetAllReservation</title>
-</head>
-<body>
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Id)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ReservationDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UserId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UserName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.BookName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.BookId)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ReservationDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UserId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UserName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.BookName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.BookId)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
-</body>
-</html>
- *@
+ 

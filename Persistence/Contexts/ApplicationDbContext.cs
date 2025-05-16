@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Persistence.Configurations.ApplicationConfigurations;
 using Persistence.Seeds.ApplicationSeed;
+using System.Reflection.Emit;
 
 namespace Persistence.Contexts
 {
@@ -33,15 +34,24 @@ namespace Persistence.Contexts
             //builder.Entity<Book>().ToTable(nameof(Books), "Gnr");
 
             #endregion
-
-
+            builder.Entity<Book>()
+            .HasOne(b => b.BookCategories)
+            .WithMany(c => c.Book)
+           .HasForeignKey(b => b.BookCategoriesId);
+            builder.Entity<DeliveryStatus>()
+           .HasOne(ds => ds.Reservation)
+           .WithMany()
+           .HasForeignKey(ds => ds.ReservationId)
+           .OnDelete(DeleteBehavior.Restrict); // جلوگیری از حذف زنجیره‌ای
 
             #region Configuration
 
             builder.ApplyConfiguration(new BookConfiguration());
             builder.ApplyConfiguration(new ReservationConfigurations());
-            builder.ApplyConfiguration(new DeliveryConfigurations());
             builder.ApplyConfiguration(new DeliveryStatusConfiguration());
+         
+
+
             //builder.ApplyConfiguration(new BookConfiguration());
 
             #endregion

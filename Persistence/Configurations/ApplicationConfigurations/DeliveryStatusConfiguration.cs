@@ -1,23 +1,21 @@
 ﻿using Domain.Entities.Reservations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Reflection.Emit;
 
 namespace Persistence.Configurations.ApplicationConfigurations
 {
-    public class DeliveryStatusConfiguration : IEntityTypeConfiguration<DeliveryStatus>
-    {
-        public void Configure(EntityTypeBuilder<DeliveryStatus> builder)
+   
+        public class DeliverysConfiguration : IEntityTypeConfiguration<Deliverys>
         {
-            // فیلتر کردن رکوردهای حذف‌شده
-            builder.HasQueryFilter(m => EF.Property<int>(m, "IsDeleted") == 0);
-
-
-            builder.HasOne(ds => ds.Reservation)
-             .WithMany()
-             .HasForeignKey(ds => ds.ReservationId)
-             .OnDelete(DeleteBehavior.Restrict); // یا NO ACTION
-
-
+            public void Configure(EntityTypeBuilder<Deliverys> builder)
+            {
+                // فعال‌سازی حذف زنجیره‌ای برای ReservationId
+                builder.HasOne(d => d.Reservation)
+                    .WithMany()
+                    .HasForeignKey(d => d.ReservationId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            }
         }
-    }
+    
 }

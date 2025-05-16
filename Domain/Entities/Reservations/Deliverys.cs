@@ -15,6 +15,7 @@ namespace Domain.Entities.Reservations
         public long BookId { get; set; }
         public virtual Book Book { get; set; }
         public virtual ICollection<DeliveryStatus> DeliveryStatuses { get; set; } = new List<DeliveryStatus>();
+       
 
     }
 }
