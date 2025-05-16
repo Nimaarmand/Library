@@ -27,64 +27,73 @@ namespace Application.Features.Implementations.Books
             _mapper = mapper;
             _userService = userService;
         }
-
-
         public async Task<string> AddReservationAsync(ReservationDto reservationDto)
         {
+            // بررسی ورودی‌ها
             if (string.IsNullOrWhiteSpace(reservationDto.UserId) || reservationDto.BookId <= 0)
+            {
                 throw new MyArgumentNullException(ErrorType.InvalidInput);
+            }
 
-            
+            // دریافت اطلاعات کاربر
             var user = await _userService.GetUserByUserId(reservationDto.UserId);
             if (user == null)
                 return "کاربر موردنظر یافت نشد.";
-
-          
+            reservationDto.UserName = user.UserName;
+            // دریافت اطلاعات کتاب
             var book = await _context.Set<Book>()
-                .Include(b => b.Reservations) 
+                .Include(b => b.Reservations)
                 .FirstOrDefaultAsync(b => b.Id == reservationDto.BookId);
-
-            if (book == null)
-                throw new MyArgumentNullException(ErrorType.BookIdNotFound);
-
            
-            if (book.IsAvailable==false) 
+            if (book == null)
             {
-               
-                book.IsAvailable = true; 
-            }
-            else
-            {
-                
-                throw new MyArgumentNullException(ErrorType.IsAvailable); 
+                throw new MyArgumentNullException(ErrorType.BookIdNotFound);
             }
 
-            
+            // بررسی وضعیت دسترسی کتاب
+            if (book.IsAvailable==true) // اگر کتاب در دسترس نیست، نمی‌توان آن را رزرو کرد
+            {
+                throw new MyArgumentNullException(ErrorType.IsAvailable);
+            }
+
+            // ایجاد رزرو جدید
             var reservation = _mapper.Map<Reservation>(reservationDto);
             reservation.ExpirationDate = DateTime.Now.AddDays(3);
 
-            
+            // اضافه کردن رزرو به لیست رزرو‌های کتاب
             book.Reservations ??= new List<Reservation>();
             book.Reservations.Add(reservation);
 
-           
-            _context.Set<Reservation>().Add(reservation);
-            _context.Set<Book>().Update(book);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
+            // تغییر وضعیت کتاب به "رزرو شده"
+            book.IsAvailable = true;
 
-            }
+            // تراکنش برای جلوگیری از خطا
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    _context.Set<Reservation>().Add(reservation);
+                    _context.Set<Book>().Update(book);
 
-           
+                    // ذخیره تغییرات در پایگاه داده
+                    await _context.SaveChangesAsync();
+
+                    // تأیید تراکنش
+                    await transaction.CommitAsync();
+                }
+                catch (Exception ex)
+                {
+                    // در صورت بروز خطا، تراکنش را بازگشت دهید
+                    await transaction.RollbackAsync();
+                    throw new Exception("خطا در ذخیره رزرو", ex);
+                }
+            }
 
             return Messages.Success("رزرو با موفقیت انجام شد");
         }
+     
 
-       
+
         public async Task<string> Remove(long id)
         {
             if (id <= 0)
@@ -147,6 +156,24 @@ namespace Application.Features.Implementations.Books
             }
 
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<ReservationDto>> GetAllReservations()
+        {
+            var reservations = await _context.Set<Reservation>()
+                .Join(_context.Set<Book>(),
+                    reservation => reservation.BookId,
+                    book => book.Id,
+                    (reservation, book) => new ReservationDto
+                    {
+                        Id = reservation.Id,
+                        BookId = book.Id,
+                        BookName = book.Name,
+                       UserName=reservation.UserName,
+                    })
+                .ToListAsync();
+
+            return reservations;
         }
     }
 

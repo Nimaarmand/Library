@@ -8,6 +8,7 @@ namespace Application.Features.Definitions.Books
         
             Task<string> AddReservationAsync(ReservationDto reservationDto);
             Task<string> Remove(long id);
+            Task<List<ReservationDto>> GetAllReservations();
             Task<IEnumerable<Reservation>> GetAllBooksAsync(CancellationToken cancellationToken = default);
             Task AutoReleaseExpiredReservationsAsync();
         

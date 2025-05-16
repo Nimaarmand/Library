@@ -39,6 +39,18 @@ namespace Library.Controllers
 
             return View(list);
         }
+        public async Task<IActionResult> GetAllReservation()
+        {
+            var list = await _reservationBookService.GetAllReservations();
+
+            if (list == null)
+            {
+                ViewBag.Message = "هیچ کتابی بدون رزرو یافت نشد.";
+                return View();
+            }
+
+            return View(list);
+        }
         public async Task<IActionResult> GetAllBookReservation()
         {
             var list = await _bookService.GetAllReservation();

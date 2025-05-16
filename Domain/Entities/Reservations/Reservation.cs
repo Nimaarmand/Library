@@ -8,11 +8,12 @@ namespace Domain.Entities.Reservations
     {
         public DateTime ReservationDate { get; set; }
         public DateTime ExpirationDate { get; set; }
-        public string UserId { get; set; }    
-             
+        public string UserId { get; set; }
+        public string UserName { get; set; }      
         public long BookId { get; set; }
         public virtual Book Book { get; set; }    
         public virtual ICollection<DeliveryStatus> DeliveryStatuses { get; set; } = new List<DeliveryStatus>();
+       
     }
 
 
