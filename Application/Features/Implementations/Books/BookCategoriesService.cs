@@ -179,15 +179,20 @@ namespace Application.Features.Implementations.Books
 
         public async Task<List<BookCategoriesDto>> GetBooks(long categoryId)
         {
-            var books = await _Context.Set<Book>().Where(b => b.BookCategoriesId == categoryId).ToListAsync();
+            var books = await _Context.Set<Book>()
+                .Include(b => b.BookCategories) 
+                .Where(b => b.BookCategories.Any(c => c.Id == categoryId)) 
+                .ToListAsync();
+
             return books.Select(book => new BookCategoriesDto
             {
-                Id = book.BookCategories.Id,
-                Name = book.BookCategories.Name,
-                Description = book.BookCategories.Description
+                Id = book.BookCategories.FirstOrDefault()?.Id ?? 0,
+                Name = book.BookCategories.FirstOrDefault()?.Name ?? "Unknown",
+                Description = book.BookCategories.Any()
+                    ? string.Join(", ", book.BookCategories.Select(c => c.Description))
+                    : "No Description"
             }).ToList();
         }
-
         public async Task<BookCategoriesDto> FindAsync(long id)
         {
             if (id <= 0)

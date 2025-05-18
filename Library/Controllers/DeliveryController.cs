@@ -1,15 +1,23 @@
-﻿using Application.Features.Definitions.Delivery;
+﻿using Application.Dtos.Delivery;
+using Application.Dtos.Identity.UserProfile;
+using Application.Features.Definitions.Delivery;
+using Application.Features.Definitions.Identity;
+using Application.Features.Definitions.Userprofile;
+using Library.Models.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace Library.Controllers
 {
     public class DeliveryController : Controller
     {
         private readonly IDeliveryService _deliveryService;
-        public DeliveryController(IDeliveryService deliveryService)
+        private readonly IUserProfileService _userService;
+        public DeliveryController(IDeliveryService deliveryService, IUserProfileService userService)
         {
             _deliveryService = deliveryService;
+            _userService = userService;
         }
         // GET: Delivery
         public ActionResult Index()
@@ -19,44 +27,73 @@ namespace Library.Controllers
 
         public async Task<IActionResult> GetAllResrvDelivery()
         {
-            var list = await _deliveryService.GetAllResrvDelivery();
-            return View(list);
+            try
+            {
+                var list = await _deliveryService.GetAllResrvDelivery();
+                return View(list);
+            }
+            catch (Exception ex)
+            {
+                return Content($"❌ خطا در نمایش اطلاعات تحویل‌شده‌ها:\n{ex.Message}\n\n{ex.StackTrace}");
+            }
         }
 
-       [HttpPost]
+
+        [HttpPost]
         public async Task<IActionResult> ReservationDelivery(long id)
         {
             var result = await _deliveryService.ReservationDelivery(id);
 
             if (result.Contains("خطا"))
             {
-                return BadRequest(result); 
+                return BadRequest(result);
             }
 
-            return Ok(result); 
+            return Ok(result);
         }
 
-
-        public ActionResult Create()
+        [HttpGet]
+        public async Task<IActionResult> Create(long bookId)
         {
-            return View();
-        }
+            var users = await _userService.GetAllUsersAsync();
 
-       
-        [HttpPost]       
-        public ActionResult Create(IFormCollection collection)
+            var modelList = users.Select(user => new CreateDeliveryViewModel
+            {
+                BookId = bookId,
+                Users = new List<UserProfileDto> { user }
+            }).ToList();
+
+            return View(modelList);
+        }
+      
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] DeliveryDto deliveryDto)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+              
+                Console.WriteLine($"BookId: {deliveryDto.BookId}, UserId: {deliveryDto.UserId}");
+
+            
+                await _deliveryService.Add(deliveryDto);
+
+                return Json(new
+                {
+                    success = true,
+                    message = "تحویل با موفقیت ثبت شد!"
+                });
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                return Json(new
+                {
+                    success = false,
+                    message = "خطایی رخ داده است: " + ex.Message
+                });
             }
         }
 
-       
+
         public ActionResult Edit(int id)
         {
             return View();
@@ -64,7 +101,7 @@ namespace Library.Controllers
 
      
         [HttpPost]
-        [ValidateAntiForgeryToken]
+       
         public ActionResult Edit(int id, IFormCollection collection)
         {
             try
@@ -98,4 +135,13 @@ namespace Library.Controllers
             }
         }
     }
+    public class TestDeliveryDto
+    {
+        public long BookId { get; set; }
+        public string UserId { get; set; }
+    }
 }
+
+
+
+

@@ -47,7 +47,7 @@ namespace Library.Controllers
                     categoryItems.Add(new SelectListItem
                     {
                         Value = child.Id.ToString(),
-                        Text = child.Name // نمایش با "--" برای تشخیص فرزندها
+                        Text = child.Name 
                     });
                 }
             }
@@ -56,8 +56,6 @@ namespace Library.Controllers
 
             return View();
         }
-
-
 
         [HttpPost]
         public async Task<IActionResult> Create(BookDto bookDto)

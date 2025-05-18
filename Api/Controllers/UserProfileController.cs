@@ -1,53 +1,56 @@
 ﻿using Application.Dtos.Identity.UserProfile;
 using Application.Features.Definitions.Userprofile;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
-[Route("api/[controller]")]
-[ApiController]
-public class UserProfileController : ControllerBase
+namespace Api.Controllers
 {
-    private readonly IUserProfileService _userProfileService;
-
-    public UserProfileController(IUserProfileService userProfileService)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class UserProfileController : ControllerBase
     {
-        _userProfileService = userProfileService;
-    }
+        private readonly IUserProfileService _userProfileService;
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<UserProfileDto>> GetUserById(string id)
-    {
-        var user = await _userProfileService.GetUserByIdAsync(id);
-        if (user == null) return NotFound("کاربر یافت نشد.");
-        return Ok(user);
-    }
+        public UserProfileController(IUserProfileService userProfileService)
+        {
+            _userProfileService = userProfileService;
+        }
 
-    [HttpGet("all")]
-    public async Task<ActionResult<IEnumerable<UserProfileDto>>> GetAllUsers()
-    {
-        var users = await _userProfileService.GetAllUsersAsync();
-        return Ok(users);
-    }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUserById(string id)
+        {
+            var user = await _userProfileService.GetUserByIdAsync(id);
+            if (user == null)
+                return NotFound(new { message = "کاربر یافت نشد." });
 
-    [HttpPost("create")]
-    public async Task<IActionResult> CreateUser([FromBody] UserProfileDto userProfileDto)
-    {
-        await _userProfileService.CreateUserAsync(userProfileDto);
-        return Ok("✅ کاربر با موفقیت ایجاد شد.");
-    }
+            return Ok(user);
+        }
 
-    [HttpPut("update/{id}")]
-    public async Task<IActionResult> UpdateUser(string id, [FromBody] UserProfileDto userProfileDto)
-    {
-        await _userProfileService.UpdateUserAsync(id, userProfileDto);
-        return Ok("✅ اطلاعات کاربر به‌روزرسانی شد.");
-    }
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            var users = await _userProfileService.GetAllUsersAsync();
+            return Ok(users);
+        }
 
-    [HttpDelete("delete/{id}")]
-    public async Task<IActionResult> DeleteUser(string id)
-    {
-        await _userProfileService.DeleteUserAsync(id);
-        return Ok("✅ کاربر با موفقیت حذف شد.");
+        [HttpPost("create")]
+        public async Task<IActionResult> CreateUser([FromBody] UserProfileDto userProfileDto)
+        {
+            await _userProfileService.CreateUserAsync(userProfileDto);
+            return Ok(new { message = "کاربر با موفقیت ایجاد شد." });
+        }
+
+        [HttpPut("update/{id}")]
+        public async Task<IActionResult> UpdateUser(string id, [FromBody] UserProfileDto userProfileDto)
+        {
+            await _userProfileService.UpdateUserAsync(id, userProfileDto);
+            return Ok(new { message = "اطلاعات کاربر به‌روزرسانی شد." });
+        }
+
+        [HttpDelete("delete/{id}")]
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            await _userProfileService.DeleteUserAsync(id);
+            return Ok(new { message = "کاربر با موفقیت حذف شد." });
+        }
     }
 }

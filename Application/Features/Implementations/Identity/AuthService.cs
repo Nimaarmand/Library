@@ -131,6 +131,7 @@ namespace Application.Features.Implementations.Identity
         {
             await _signInManager.SignOutAsync();
         }
+
         public async Task<string> GetCurrentUserId()
         {
             var result = await Task.Run(() =>

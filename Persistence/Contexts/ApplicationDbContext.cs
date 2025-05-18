@@ -34,15 +34,7 @@ namespace Persistence.Contexts
             //builder.Entity<Book>().ToTable(nameof(Books), "Gnr");
 
             #endregion
-            builder.Entity<Book>()
-            .HasOne(b => b.BookCategories)
-            .WithMany(c => c.Book)
-           .HasForeignKey(b => b.BookCategoriesId);
-            builder.Entity<DeliveryStatus>()
-           .HasOne(ds => ds.Reservation)
-           .WithMany()
-           .HasForeignKey(ds => ds.ReservationId)
-           .OnDelete(DeleteBehavior.Restrict); // جلوگیری از حذف زنجیره‌ای
+          
 
             #region Configuration
 

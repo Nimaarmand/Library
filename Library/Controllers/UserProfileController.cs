@@ -1,8 +1,10 @@
 ﻿using Application.Dtos.Identity.UserProfile;
 using Application.Features.Definitions.Userprofile;
+using Application.MappingProfile;
 using Domain.Entities.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using RestSharp;
 using System.Text.Json;
 
 namespace Library.Controllers
@@ -10,6 +12,7 @@ namespace Library.Controllers
     public class UserProfileController : Controller
     {
         private readonly IUserProfileService _userProfileService;
+       
         private readonly UserManager<ApplicationUser> _userManager;
 
         public UserProfileController(IUserProfileService userProfileService, UserManager<ApplicationUser> userManager)
@@ -19,22 +22,42 @@ namespace Library.Controllers
            _userManager = userManager;
         }
 
-
         public async Task<IActionResult> Index()
         {
             var id = _userManager.GetUserId(User);
             if (id != null)
             {
+                // دریافت اطلاعات کاربر
                 var user = await _userProfileService.GetUserByIdAsync(id);
-                return View(user); // مدل از نوع UserProfileDto است
+
+                // دریافت اطلاعات پروفایل کاربر
+                var profile = await _userProfileService.GetUserByIdAsync(id);
+
+                if (profile != null && !string.IsNullOrEmpty(profile.ImagePath))
+                {
+                    user.ImagePath = $"/uploads/{profile.ImagePath}"; // مقداردهی مسیر تصویر
+                }
+
+                return View(user);
             }
             return NotFound();
         }
+        //public async Task<IActionResult> Index()
+        //{
+        //    var id = _userManager.GetUserId(User);
+        //    if (id != null)
+        //    {
+        //        var user = await _userProfileService.GetUserByIdAsync(id);
+        //        return View(user); // مدل از نوع UserProfileDto است
+        //    }
+        //    return NotFound();
+        //}
 
 
 
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details()
         {
+            var id= _userManager.GetUserId(User);
             var user = await _userProfileService.GetUserByIdAsync(id);
             if (user == null)
                 return NotFound();
@@ -47,68 +70,51 @@ namespace Library.Controllers
             return View();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create([FromForm] UserProfileDto userProfileDto, IFormFile imageFile)
+        [HttpPost("create")]
+        public async Task<IActionResult> Create([FromForm] UserProfileDto userProfileDto, [FromForm] IFormFile ProfileImage)
         {
             var userId = _userManager.GetUserId(User);
-            userProfileDto.Id = userId;
+            userProfileDto.UserId = userId;
 
-            if (string.IsNullOrEmpty(userProfileDto.Id))
+            if (string.IsNullOrEmpty(userProfileDto.UserId))
             {
-                return BadRequest(new
+                return Json(new
                 {
                     success = false,
                     message = "ابتدا باید وارد شوید."
                 });
             }
-
-            if (imageFile == null || imageFile.Length == 0)
+            if (ProfileImage != null && ProfileImage.Length > 0)
             {
-                return BadRequest(new
+                var client = new RestClient("https://localhost:44376");
+                var request = new RestRequest("/api/FileUpload/upload", Method.Post); 
+
+                using (var memoryStream = new MemoryStream())
                 {
-                    success = false,
-                    message = "تصویر ارسال نشده است."
-                });
-            }
+                    await ProfileImage.CopyToAsync(memoryStream);
+                    request.AddFile("imageFile", memoryStream.ToArray(), ProfileImage.FileName, "multipart/form-data");
+                }
 
-            // 📤 ارسال تصویر به API آپلود
-            using var httpClient = new HttpClient();
-            using var formData = new MultipartFormDataContent();
+                var response = await client.ExecuteAsync<UploadResponseDto>(request);
 
-            var streamContent = new StreamContent(imageFile.OpenReadStream());
-            streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(imageFile.ContentType);
-            formData.Add(streamContent, "imageFile", imageFile.FileName);
-
-            var response = await httpClient.PostAsync("https://localhost:5001/api/UploadImage", formData); // آدرس API خودت رو بزن
-
-            if (!response.IsSuccessStatusCode)
-            {
-                return StatusCode((int)response.StatusCode, new
+                if (response.IsSuccessful && response.Data != null)
                 {
-                    success = false,
-                    message = "آپلود تصویر با خطا مواجه شد."
-                });
+                    userProfileDto.ImagePath = response.Data.FileUrl;
+                }
+                else
+                {
+                    return BadRequest(new { success = false, message = "خطا در آپلود تصویر." });
+                }
             }
-
-            var jsonResult = await response.Content.ReadAsStringAsync();
-            var uploadResponse = JsonSerializer.Deserialize<UploadResult>(jsonResult, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
-
-            // ذخیره نام فایل در DTO
-            userProfileDto.ImagePath = uploadResponse.FileName;
-
-            // ذخیره اطلاعات کاربر
             await _userProfileService.CreateUserAsync(userProfileDto);
 
             return Json(new
             {
                 success = true,
-                message = "پروفایل با موفقیت ثبت شد."
+                message = "اطلاعات کاربر با موفقیت ثبت شد!",
+                imageUrl = userProfileDto.ImagePath
             });
         }
-
 
 
         public async Task<IActionResult> Edit(string id)
@@ -145,6 +151,12 @@ namespace Library.Controllers
             await _userProfileService.DeleteUserAsync(id);
             return RedirectToAction(nameof(Index));
         }
+    }
+    public class UploadResponseDto
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; }
+        public string FileUrl { get; set; }
     }
 
 }

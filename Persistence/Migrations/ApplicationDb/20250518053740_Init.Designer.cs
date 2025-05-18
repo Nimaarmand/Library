@@ -12,7 +12,7 @@ using Persistence.Contexts;
 namespace Persistence.Migrations.ApplicationDb
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250516182922_Init")]
+    [Migration("20250518053740_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -25,6 +25,21 @@ namespace Persistence.Migrations.ApplicationDb
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("BookBookCategories", b =>
+                {
+                    b.Property<long>("BookCategoriesId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("BookId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("BookCategoriesId", "BookId");
+
+                    b.HasIndex("BookId");
+
+                    b.ToTable("BookBookCategories", "dbo");
+                });
 
             modelBuilder.Entity("Domain.Entities.Books.Book", b =>
                 {
@@ -90,8 +105,6 @@ namespace Persistence.Migrations.ApplicationDb
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BookCategoriesId");
-
                     b.ToTable("Books", "dbo");
                 });
 
@@ -155,10 +168,7 @@ namespace Persistence.Migrations.ApplicationDb
                     b.Property<int>("IsDeleted")
                         .HasColumnType("int");
 
-                    b.Property<long>("ReservationId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("ReservationId1")
+                    b.Property<long?>("ReservationId")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime?>("UpdateTime")
@@ -177,8 +187,6 @@ namespace Persistence.Migrations.ApplicationDb
 
                     b.HasIndex("ReservationId");
 
-                    b.HasIndex("ReservationId1");
-
                     b.ToTable("DeliveryStatus", "dbo");
                 });
 
@@ -196,7 +204,10 @@ namespace Persistence.Migrations.ApplicationDb
                     b.Property<DateTime>("DeliveryTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("ReservationId")
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<long?>("ReservationId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("UserId")
@@ -325,20 +336,28 @@ namespace Persistence.Migrations.ApplicationDb
                     b.Property<string>("UpdateUserId")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("ProfileUser", "dbo");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Books.Book", b =>
+            modelBuilder.Entity("BookBookCategories", b =>
                 {
-                    b.HasOne("Domain.Entities.Books.BookCategories", "BookCategories")
-                        .WithMany("Book")
+                    b.HasOne("Domain.Entities.Books.BookCategories", null)
+                        .WithMany()
                         .HasForeignKey("BookCategoriesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("BookCategories");
+                    b.HasOne("Domain.Entities.Books.Book", null)
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Domain.Entities.Books.BookCategories", b =>
@@ -358,19 +377,11 @@ namespace Persistence.Migrations.ApplicationDb
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Reservations.Reservation", "Reservation")
-                        .WithMany()
-                        .HasForeignKey("ReservationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Domain.Entities.Reservations.Reservation", null)
                         .WithMany("DeliveryStatuses")
-                        .HasForeignKey("ReservationId1");
+                        .HasForeignKey("ReservationId");
 
                     b.Navigation("Delivery");
-
-                    b.Navigation("Reservation");
                 });
 
             modelBuilder.Entity("Domain.Entities.Reservations.Deliverys", b =>
@@ -384,8 +395,7 @@ namespace Persistence.Migrations.ApplicationDb
                     b.HasOne("Domain.Entities.Reservations.Reservation", "Reservation")
                         .WithMany()
                         .HasForeignKey("ReservationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Book");
 
@@ -412,8 +422,6 @@ namespace Persistence.Migrations.ApplicationDb
 
             modelBuilder.Entity("Domain.Entities.Books.BookCategories", b =>
                 {
-                    b.Navigation("Book");
-
                     b.Navigation("Children");
                 });
 

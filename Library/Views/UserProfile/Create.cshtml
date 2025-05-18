@@ -85,7 +85,7 @@
 
 <script>
     $(document).ready(function () {
-        // پیام‌های فارسی Kendo Validator
+        
         kendo.ui.validator.messages = {
             required: "پر کردن این فیلد الزامی است.",
             pattern: "فرمت وارد شده معتبر نیست.",
@@ -96,14 +96,14 @@
 
         const validator = $("#createForm").kendoValidator().data("kendoValidator");
 
-        // تقویم شمسی
+       
         $("#birthDate").persianDatepicker({
             format: "YYYY/MM/DD",
             initialValueType: 'persian',
             autoClose: true
         });
 
-        // گرفتن نام فایل تصویر
+      
         $("#imageFile").on("change", function () {
             const file = this.files[0];
             if (file) {

@@ -136,7 +136,7 @@ namespace Library.Controllers
       
         [HttpPost]
         
-        public ActionResult Delete(int id, IFormCollection collection)
+        public IActionResult Delete(int id, IFormCollection collection)
         {
             try
             {
@@ -146,6 +146,13 @@ namespace Library.Controllers
             {
                 return View();
             }
+        }
+
+        public async Task<IActionResult> Logout()
+        {
+           await _authService.Logout();
+           return RedirectToAction("Index", "Home");
+
         }
     }
 }

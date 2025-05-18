@@ -16,14 +16,14 @@ namespace Domain.Entities.Books
         public string? Language { get; set; }
         public bool IsAvailable { get; set; } = true;
         public string? PublicationDate { get; set; }
-        // ارتباط مستقیم با دسته‌بندی کتاب
+      
         public long BookCategoriesId { get; set; }
-        public virtual BookCategories BookCategories { get; set; }
-        // ارتباط مستقیم با رزروها
+
+        public virtual ICollection<BookCategories> BookCategories { get; set; } = new List<BookCategories>();
+       
+   
         public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
-        /// <summary>
-        /// ارتباط با کتاب های تحویل داده شده
-        /// </summary>
+        
         public virtual ICollection<Deliverys> Deliveries { get; set; } = new List<Deliverys>();
     }
 

@@ -19,10 +19,10 @@ using Persistence.Contexts;
 using Persistence.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IReservationBookService, ReservationBookService>();
 builder.Services.AddScoped<IGenericRepository, GenericRepository>();
 builder.Services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
-builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IBookCategories, BookCategoriesService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();

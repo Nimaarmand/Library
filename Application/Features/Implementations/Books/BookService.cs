@@ -118,20 +118,31 @@ namespace Application.Features.Implementations.Books
 
         }
         public async Task<List<BookDto>> GetAllReservation()
-        {         
+        {
+           
             var reservationBooks = await _Context.Set<Book>()
-                .Where(b => b.IsAvailable == true)
-                .ToListAsync();           
+                .Where(b => b.IsAvailable) 
+                .Include(b => b.BookCategories) 
+                .ToListAsync();
+
+           
+            if (reservationBooks == null || !reservationBooks.Any())
+                return new List<BookDto>();
+
+           
             var list = _mapper.Map<List<BookDto>>(reservationBooks);
 
             return list;
         }
-
         public async Task<List<BookDto>> GetAllNotReservation()
         {
             var reservationBooks = await _Context.Set<Book>()
-                .Where(b => b.IsAvailable == false)
+                .Where(b => !b.IsAvailable) 
+                .Include(b => b.BookCategories) 
                 .ToListAsync();
+        
+            if (reservationBooks == null || !reservationBooks.Any())
+                return new List<BookDto>();
 
             var list = _mapper.Map<List<BookDto>>(reservationBooks);
 

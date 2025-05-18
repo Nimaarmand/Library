@@ -2,64 +2,21 @@
 
 namespace Application.Dtos.Books
 {
+
+
     public class BookDto
     {
-
         public long Id { get; set; }
-        /// <summary>
-        /// نام کتاب
-        /// </summary>
         public string Name { get; set; }
-
-        /// <summary>
-        /// نویسنده کتاب
-        /// </summary>
         public string Author { get; set; }
-
-        /// <summary>
-        /// موضوع کتاب
-        /// </summary>
         public string Subject { get; set; }
-
-        /// <summary>
-        /// شماره شناسایی بین‌المللی کتاب (ISBN)
-        /// </summary>
         public string ISBN { get; set; }
-
-        /// <summary>
-        /// تعداد صفحات کتاب
-        /// </summary>
         public int Pages { get; set; }
-
-        /// <summary>
-        /// ناشر کتاب
-        /// </summary>
         public string Publisher { get; set; }
-
-        /// <summary>
-        /// زبان کتاب
-        /// </summary>
         public string Language { get; set; }
-
-        /// <summary>
-        /// مشخص می‌کند که آیا کتاب در دسترس است یا خیر
-        /// </summary>
         public bool IsAvailable { get; set; }
-
-        /// <summary>
-        /// تاریخ انتشار کتاب
-        /// </summary>
         public DateTime PublicationDate { get; set; }
-
-        /// <summary>
-        /// شناسه دسته‌بندی کتاب
-        /// </summary>
-        public long BookCategoriesId { get; set; }
-
-        /// <summary>
-        /// شی مرتبط به دسته‌بندی کتاب‌ها
-        /// </summary>
-        public BookCategories BookCategories { get; set; }
-
+        public long BookCategoriesId { get; set; }    
+        public List<BookCategoriesDto> BookCategories { get; set; } = new List<BookCategoriesDto>();
     }
 }

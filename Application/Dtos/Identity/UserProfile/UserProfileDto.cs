@@ -8,7 +8,8 @@ namespace Application.Dtos.Identity.UserProfile
 {
     public class UserProfileDto
     {
-        public string Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public string UserId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string NationalCode { get; set; }

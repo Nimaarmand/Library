@@ -37,33 +37,6 @@ namespace Persistence.Migrations.ApplicationDb
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProfileUser",
-                schema: "dbo",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NationalCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BirthDate = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    InsertTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeleteTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<int>(type: "int", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    InsertUserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UpdateUserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DeleteUserId = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ProfileUser", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Books",
                 schema: "dbo",
                 columns: table => new
@@ -92,11 +65,59 @@ namespace Persistence.Migrations.ApplicationDb
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Books", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProfileUser",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NationalCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BirthDate = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    InsertTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    InsertUserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdateUserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DeleteUserId = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProfileUser", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BookBookCategories",
+                schema: "dbo",
+                columns: table => new
+                {
+                    BookCategoriesId = table.Column<long>(type: "bigint", nullable: false),
+                    BookId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BookBookCategories", x => new { x.BookCategoriesId, x.BookId });
                     table.ForeignKey(
-                        name: "FK_Books_BookCategories_BookCategoriesId",
+                        name: "FK_BookBookCategories_BookCategories_BookCategoriesId",
                         column: x => x.BookCategoriesId,
                         principalSchema: "dbo",
                         principalTable: "BookCategories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BookBookCategories_Books_BookId",
+                        column: x => x.BookId,
+                        principalSchema: "dbo",
+                        principalTable: "Books",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -141,9 +162,10 @@ namespace Persistence.Migrations.ApplicationDb
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DeliveryTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ReservationId = table.Column<long>(type: "bigint", nullable: false),
+                    ReservationId = table.Column<long>(type: "bigint", nullable: true),
                     BookId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
@@ -173,11 +195,10 @@ namespace Persistence.Migrations.ApplicationDb
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ReservationId = table.Column<long>(type: "bigint", nullable: false),
                     DeliveryState = table.Column<bool>(type: "bit", nullable: false),
                     BookBack = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DeliveryId = table.Column<long>(type: "bigint", nullable: false),
-                    ReservationId1 = table.Column<long>(type: "bigint", nullable: true),
+                    ReservationId = table.Column<long>(type: "bigint", nullable: true),
                     InsertTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DeleteTime = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -202,27 +223,20 @@ namespace Persistence.Migrations.ApplicationDb
                         column: x => x.ReservationId,
                         principalSchema: "dbo",
                         principalTable: "Reservations",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_DeliveryStatus_Reservations_ReservationId1",
-                        column: x => x.ReservationId1,
-                        principalSchema: "dbo",
-                        principalTable: "Reservations",
                         principalColumn: "Id");
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BookBookCategories_BookId",
+                schema: "dbo",
+                table: "BookBookCategories",
+                column: "BookId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BookCategories_ParentId",
                 schema: "dbo",
                 table: "BookCategories",
                 column: "ParentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Books_BookCategoriesId",
-                schema: "dbo",
-                table: "Books",
-                column: "BookCategoriesId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Deliveries_BookId",
@@ -249,12 +263,6 @@ namespace Persistence.Migrations.ApplicationDb
                 column: "ReservationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DeliveryStatus_ReservationId1",
-                schema: "dbo",
-                table: "DeliveryStatus",
-                column: "ReservationId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Reservations_BookId",
                 schema: "dbo",
                 table: "Reservations",
@@ -265,11 +273,19 @@ namespace Persistence.Migrations.ApplicationDb
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "BookBookCategories",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
                 name: "DeliveryStatus",
                 schema: "dbo");
 
             migrationBuilder.DropTable(
                 name: "ProfileUser",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
+                name: "BookCategories",
                 schema: "dbo");
 
             migrationBuilder.DropTable(
@@ -282,10 +298,6 @@ namespace Persistence.Migrations.ApplicationDb
 
             migrationBuilder.DropTable(
                 name: "Books",
-                schema: "dbo");
-
-            migrationBuilder.DropTable(
-                name: "BookCategories",
                 schema: "dbo");
         }
     }

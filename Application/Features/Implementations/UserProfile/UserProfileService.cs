@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Application.Features.Definitions.Userprofile;
 using Application.Constants.Commons;
 using Application.MappingProfile;
+using System.Xml;
 
 namespace Application.Features.Implementations.UserProfile
 {
@@ -31,23 +32,33 @@ namespace Application.Features.Implementations.UserProfile
             return user == null ? null : _mapper.Map<UserProfileDto>(user);
         }
 
-        public async Task<IEnumerable<UserProfileDto>> GetAllUsersAsync()
+        public async Task<List<UserProfileDto>> GetAllUsersAsync()
         {
             var users = await _context.Set<ProfileUser>().ToListAsync();
-            return _mapper.Map<IEnumerable<UserProfileDto>>(users);
+            return _mapper.Map<List<UserProfileDto>>(users);
         }
-
         public async Task CreateUserAsync(UserProfileDto userProfileDto)
         {
-            if (userProfileDto != null)
+            try
             {
+                if (userProfileDto == null)
+                    throw new ArgumentNullException(nameof(userProfileDto));
+
                 var entity = _mapper.Map<ProfileUser>(userProfileDto);
+
+                if (_context == null)
+                    throw new InvalidOperationException("DbContext مقداردهی نشده است.");
+
                 await _context.Set<ProfileUser>().AddAsync(entity);
                 await _context.SaveChangesAsync();
-
             }
-
+            catch (Exception ex)
+            {
+                
+                throw; 
+            }
         }
+        
 
         public async Task UpdateUserAsync(string id, UserProfileDto userProfileDto)
         {
@@ -66,5 +77,40 @@ namespace Application.Features.Implementations.UserProfile
             _context.Set<ProfileUser>().Remove(entity);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<UserProfileDto> GetByIdAsync(string id)
+        {
+            try
+            {
+                if (id == null)
+                {
+                    throw new ArgumentException("شناسه نامعتبر است.");
+                }
+
+               
+                var entity = await _context.Set<ProfileUser>().FindAsync(id);
+
+                
+                if (entity == null)
+                {
+                    throw new KeyNotFoundException("اطلاعاتی با این شناسه یافت نشد.");
+                }
+
+                
+                return new UserProfileDto
+                {
+                    Id = entity.Id,
+                   
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ خطا در دریافت اطلاعات: {ex.Message}");
+                throw;
+            }
+        }
+
     }
+
+
 }

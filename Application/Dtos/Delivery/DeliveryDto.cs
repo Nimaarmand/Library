@@ -1,4 +1,6 @@
-﻿namespace Application.Dtos.Delivery
+﻿using Application.Dtos.Identity.UserProfile;
+
+namespace Application.Dtos.Delivery
 {
     public class DeliveryDto
     {
@@ -12,5 +14,7 @@
         public DateTime DeliveryTime { get; set; }
         public string UserName { get; set; }
         public bool DeliveryState { get; set; }
+        public string? BookName { get; internal set; }
+       
     }
 }
