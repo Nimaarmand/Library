@@ -70,7 +70,7 @@ namespace Library.Controllers
             return View();
         }
 
-        [HttpPost("create")]
+        [HttpPost]
         public async Task<IActionResult> Create([FromForm] UserProfileDto userProfileDto, [FromForm] IFormFile ProfileImage)
         {
             var userId = _userManager.GetUserId(User);

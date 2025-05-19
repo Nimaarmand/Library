@@ -41,7 +41,8 @@
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" asp-controller="Account" asp-action="Register">ثبت‌نام</a></li>
                             <li><a class="dropdown-item" asp-controller="Account" asp-action="Login">ورود</a></li>
-                            <li><a class="dropdown-item" asp-controller="UserProfile" asp-action="Create">تکمیل حساب کاربری</a></li>
+                             <li><a class="dropdown-item" href="@Url.Action("Create", "UserProfile")">تکمیل حساب کاربری</a></li>
+                          @*   <li><a class="dropdown-item" asp-controller="UserProfile" asp-action="Create">تکمیل حساب کاربری</a></li> *@
                             <li><a class="dropdown-item" asp-controller="UserProfile" asp-action="Index">حساب من</a></li>
                             <li><a class="dropdown-item" asp-controller="Account" asp-action="Logout">خروج از حساب</a></li>
                             <li><a class="dropdown-item" asp-controller="Account" asp-action="ListUser">لیست کاربران </a></li>
@@ -75,7 +76,7 @@
 
                             <li>
                                 <a class="dropdown-item" href="~/Reservation/GetAllBookNotReservation">
-                                     کتاب های آزاد
+                                     کتاب های رزرو نشده
                                 </a>
                             </li>
 
@@ -93,6 +94,12 @@
                             <li>
                                 <a class="dropdown-item" href="~/Delivery/GetAllResrvDelivery">
                                   رزرو های تحویل شده
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="dropdown-item" href="~/Delivery/GetAllDelivery">
+                                    تحویل های بدون رزرو
                                 </a>
                             </li>
 

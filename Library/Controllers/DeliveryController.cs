@@ -38,6 +38,32 @@ namespace Library.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> ReturnBook(long id)
+        {
+            try
+            {
+                var list = await _deliveryService.ReturnBook(id);
+                return View(list);
+            }
+            catch (Exception ex)
+            {
+                return Content($" پس گرفتن کتاب:\n{ex.Message}\n\n{ex.StackTrace}");
+            }
+        }
+
+        public async Task<IActionResult> GetAllDelivery()
+        {
+            try
+            {
+                var list = await _deliveryService.GetAllDelivery();
+                return View(list);
+            }
+            catch (Exception ex)
+            {
+                return Content($"❌ خطا در نمایش اطلاعات تحویل‌شده‌ها:\n{ex.Message}\n\n{ex.StackTrace}");
+            }
+        }
 
         [HttpPost]
         public async Task<IActionResult> ReservationDelivery(long id)

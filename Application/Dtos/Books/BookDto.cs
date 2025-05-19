@@ -15,7 +15,7 @@ namespace Application.Dtos.Books
         public string Publisher { get; set; }
         public string Language { get; set; }
         public bool IsAvailable { get; set; }
-        public DateTime PublicationDate { get; set; }
+        public string PublicationDate { get; set; }
         public long BookCategoriesId { get; set; }    
         public List<BookCategoriesDto> BookCategories { get; set; } = new List<BookCategoriesDto>();
     }

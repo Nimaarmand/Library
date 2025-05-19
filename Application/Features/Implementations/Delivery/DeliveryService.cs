@@ -3,6 +3,7 @@ using Application.Dtos.Delivery;
 using Application.Features.Definitions.Books;
 using Application.Features.Definitions.Contexts;
 using Application.Features.Definitions.Delivery;
+using Application.Features.Definitions.Identity;
 using Application.Features.Definitions.Userprofile;
 using Application.Repositories;
 using AutoMapper;
@@ -20,21 +21,26 @@ namespace Application.Features.Implementations.Delivery
         private readonly IBookService _bookService;
         private readonly IUserProfileService _Userprofile;
         private readonly IMapper _mapper;
+        private readonly IUserService _userService;
         private readonly UserManager<ApplicationUser> _userManager;
-        public DeliveryService(IMapper mapper, IApplicationDbContext context, UserManager<ApplicationUser> userManager, IBookService bookService, IUserProfileService userprofile)
+        public DeliveryService(IMapper mapper,
+            IApplicationDbContext context,
+
+            IBookService bookService,
+            IUserProfileService userprofile,
+            IUserService userService
+,
+            UserManager<ApplicationUser> userManager)
         {
             _mapper = mapper;
             _Context = context;
-            _userManager = userManager;
             _bookService = bookService;
             _Userprofile = userprofile;
+            _userService = userService;
+            _userManager = userManager;
         }
 
-        /// <summary>
-        /// تحویل کتاب به کاربر
-        /// </summary>
-        /// <param name="deliveryDto"></param>
-        /// <returns></returns>
+
         public async Task<string> Add(DeliveryDto deliveryDto)
         {
             try
@@ -48,17 +54,17 @@ namespace Application.Features.Implementations.Delivery
                     {
                         return Messages.Error("شما هنوز کتاب قبلی را پس نداده‌اید و نمی‌توانید کتاب جدید دریافت کنید.");
                     }
-                    var book= await _bookService.FindAsync(deliveryDto.BookId);
+                    var book = await _bookService.FindAsync(deliveryDto.BookId);
                     deliveryDto.BookName = book.Name;
-                    var user=await _Userprofile.GetByIdAsync(deliveryDto.UserId);
-                    deliveryDto.UserName=user.FirstName;
-                   
-                                                   
+                    var user = await _Userprofile.GetByIdAsync(deliveryDto.UserId);
+                    deliveryDto.UserName = user.FirstName;
+
+
                     var deliverys = new Deliverys();
                     deliverys.BookId = deliveryDto.BookId;
-                    deliverys.UserId = deliveryDto.UserId;                  
-                    deliverys.DeliveryTime = DateTime.Now;                 
-                   
+                    deliverys.UserId = deliveryDto.UserId;
+                    deliverys.DeliveryTime = DateTime.Now;
+
 
                     var deliveryStatus = new DeliveryStatus
                     {
@@ -85,11 +91,7 @@ namespace Application.Features.Implementations.Delivery
             }
         }
 
-        /// <summary>
-        /// پس گرفتن کتاب از کاربر
-        /// </summary>
-        /// <param name="deliveryId"></param>
-        /// <returns></returns>
+
         public async Task<string> ReturnBook(long deliveryId)
         {
             var deliveryStatus = await _Context.Set<DeliveryStatus>()
@@ -109,11 +111,6 @@ namespace Application.Features.Implementations.Delivery
             return Messages.Success("کتاب با موفقیت پس داده شد.");
         }
 
-        /// <summary>
-        /// تحویل کتاب رزرو شده به کاربر
-        /// </summary>
-        /// <param name="reservId"></param>
-        /// <returns></returns>
         public async Task<string> ReservationDelivery(long reservId)
         {
             if (reservId <= 0)
@@ -163,22 +160,83 @@ namespace Application.Features.Implementations.Delivery
             return Messages.Success("کتاب با موفقیت به کاربر تحویل داده شد.");
         }
 
-        public async Task<List<DeliveryDto>> GetAllResrvDelivery()
+
+        public async Task<List<DeliveryDto>> GetAllDelivery()
         {
-
-
             try
             {
+                // دریافت لیست تحویل‌هایی که وضعیت تحویل دارند
+                var deliveries = await _Context.Set<Deliverys>()
+                    .Where(d => d.DeliveryStatuses.Any(ds => ds.DeliveryState))
+                    .ToListAsync();
+
+                // استخراج شناسه‌های کاربران
+                var userIds = deliveries
+                    .Select(d => d.UserId)
+                    .Distinct()
+                    .ToList();
+
+              
+                var bookIds = deliveries
+                    .Select(d => d.BookId)
+                    .Distinct()
+                    .ToList();
+
+              
+                var profileUsers = await _Context.Set<ProfileUser>()
+                    .Where(p => userIds.Contains(p.Id)) 
+                    .ToDictionaryAsync(p => p.Id, p => p.NationalCode);
+
+               
+                var books = await _Context.Set<Book>()
+                    .Where(b => bookIds.Contains(b.Id))
+                    .ToDictionaryAsync(b => b.Id, b => b.Name);
+
+               
+                var result = deliveries.Select(d => new DeliveryDto
+                {
+                    Id = d.Id,
+                    UserId = d.UserId,
+                    UserName = profileUsers.GetValueOrDefault(d.UserId, "کد ملی یافت نشد"), 
+                    BookId = d.BookId,
+                    BookName = books.GetValueOrDefault(d.BookId, "نام کتاب یافت نشد"),
+                    DeliveryTime = d.DeliveryTime,
+                    ReservationId = d.ReservationId ?? 0,
+                    DeliveryState = d.DeliveryStatuses.FirstOrDefault()?.DeliveryState ?? false
+                })
+                .Where(d => d.ReservationId == 0) 
+                .ToList();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("❌ خطا در دریافت اطلاعات تحویل‌ها:");
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
+                return new List<DeliveryDto>();
+            }
+        }
+
+        public async Task<List<DeliveryDto>> GetAllResrvDelivery()
+        {
+            try
+            {
+
                 var deliveries = await _Context.Set<Deliverys>()
                     .Include(d => d.Reservation)
                         .ThenInclude(r => r.Book)
                     .Include(d => d.DeliveryStatuses)
-                    .Where(d => d.DeliveryStatuses.Any(ds => ds.DeliveryState))
+                    .Where(d => d.DeliveryStatuses.Any(ds => ds.DeliveryState)
+                                && d.Reservation != null)
                     .ToListAsync();
 
-                var userIds = deliveries.Select(d => d.UserId.ToString()).Distinct().ToList();
+                var userIds = deliveries
+                    .Select(d => d.UserId.ToString())
+                    .Distinct()
+                    .ToList();
 
-                var users = await _userManager.Users
+                var identityUsers = await _userManager.Users
                     .Where(u => userIds.Contains(u.Id))
                     .ToDictionaryAsync(u => u.Id, u => u.UserName);
 
@@ -186,33 +244,24 @@ namespace Application.Features.Implementations.Delivery
                 {
                     Id = d.Id,
                     UserId = d.UserId,
-                    UserName = users.GetValueOrDefault(d.UserId.ToString()),
+                    UserName = identityUsers.GetValueOrDefault(d.UserId.ToString()),
                     BookId = d.BookId,
                     BookName = d.Reservation?.Book?.Name,
                     DeliveryTime = d.DeliveryTime,
                     ReservationId = d.Reservation?.Id ?? 0,
                     DeliveryState = d.DeliveryStatuses.FirstOrDefault()?.DeliveryState ?? false
-                }).ToList();
+                }).Where(d => d.ReservationId != 0).ToList();
 
                 return result;
             }
             catch (Exception ex)
             {
-                // لاگ خطا در کنسول یا فایل
                 Console.WriteLine("❌ خطا در دریافت اطلاعات تحویل‌ها:");
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.StackTrace);
-
-
-
-
                 return new List<DeliveryDto>();
             }
         }
-
-
-
-
 
     }
 }

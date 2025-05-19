@@ -3,7 +3,6 @@
 @{
     Layout = null;
 }
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,11 +22,12 @@
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 </head>
+@Html.AntiForgeryToken()
 
 
 <body>
     <div class="container mt-3">
-        <h2 class="text-center">رزرو های کاربران</h2>
+        <h2 class="text-center">تحویل شده به کاربران</h2>
         <div class="mb-3" dir="rtl">
             <div class="input-group">
                 <input type="text" class="form-control" id="searchInput" placeholder="جستجو کنید..." aria-label="جستجو" aria-describedby="searchIcon">
@@ -39,7 +39,8 @@
                 <tr>
                     <th hidden>  id</th>
                     <th>نام کاربر</th>
-                    <th>نام کتاب</th>                                   
+                    <th>نام کتاب</th>  
+                    <th>وضعیت تحویل</th> 
                     <th>تاریخ تحویل</th>                                
                      <th>عملیات</th>
                 </tr>
@@ -51,6 +52,7 @@
                         <td hidden>@item.Id</td hidden>
                         <td>@item.UserName</td>
                         <td>@item.BookName</td>
+                        <td>@item.DeliveryState</td>
                         <td>@item.DeliveryTime</td>
                         <td hidden>@item.BookId</td>
                         <td hidden>@item.UserId</td>
@@ -62,31 +64,12 @@
                                     عملیات
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-
-
-                                  
+                              
                                    <li>
                                       <a href="#" class="dropdown-item btn-add-sub" data-id="@item.Id">
-                                                         <i class="fas fa-plus"></i> تحویل کتاب به کاربر
+                                                         <i class="fas fa-plus"></i> پس گرفتن کتاب
                                        </a>
-                                   </li>
- 
-                                    <li>
-                                       <a class="dropdown-item btn-show-sub" href="#" data-id="@item.Id">
-                                            <i class="fas fa-eye"></i> نمایش زیر مجموعه
-                                       </a>
-                                    </li> 
-
-                                    <li>
-                                                <a class="dropdown-item btn-edit" href="#" data-id="@item.Id">
-                                                      <i class="fas fa-edit"></i> ویرایش
-                                                </a>
-                                    </li>
-
-
-
-                                    <li>  <a class="dropdown-item text-danger delete-category" data-id="@item.Id" href="#"> <i class="fas fa-trash"></i> حذف </a> </li>
-
+                                   </li>                                  
 
                                 </ul>
                             </div>
@@ -106,52 +89,57 @@
 
 
  <script>
-   $(document).ready(function () {
-    
-    $("#searchInput").on("keyup", function () {
-        var input = $(this).val().toLowerCase();
-        $("#dataTable tr").each(function (index) {
-            if (index === 0) return;
-            var found = $(this).text().toLowerCase().includes(input);
-            $(this).toggle(found);
-        });
-    });
- 
-    $(".btn-add-sub").click(function (e) {
-        e.preventDefault();
-        var reservId = $(this).data("id");
+    $(document).ready(function () {
 
-        $.ajax({
-            url: "/Delivery/ReservationDelivery",
-            type: "POST",
-            data: { id: reservId },
-            success: function (response) {
-                Swal.fire({
-                    title: "موفقیت!",
-                    text: response,
-                    icon: "success",
-                    timer: 2000
-                }).then(() => {
-                    location.reload();
-                });
-            },
-            error: function (xhr) {
-                Swal.fire({
-                    title: "خطا!",
-                    text: xhr.responseText,
-                    icon: "error",
-                    confirmButtonText: "متوجه شدم"
-                });
-            }
+      
+        $("#searchInput").on("keyup", function () {
+            var input = $(this).val().toLowerCase();
+            $("#dataTable tr").each(function (index) {
+                if (index === 0) return;
+                var found = $(this).text().toLowerCase().includes(input);
+                $(this).toggle(found);
+            });
+        });
+
+        
+        $(".btn-add-sub").click(function (e) {
+            e.preventDefault();
+            var reservId = $(this).data("id");
+            console.log("✅ کلیک شد، آیدی:", reservId);
+
+            $.ajax({
+                url: "/Delivery/ReturnBook",
+                type: "POST",
+                data: { id: reservId },
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function (response) {
+                    Swal.fire({
+                        title: "موفقیت!",
+                        text: response,
+                        icon: "success",
+                        timer: 2000
+                    }).then(() => {
+                        location.reload();
+                    });
+                },
+                error: function (xhr) {
+                    Swal.fire({
+                        title: "خطا!",
+                        text: xhr.responseText,
+                        icon: "error",
+                        confirmButtonText: "باشه"
+                    });
+                }
+            });
         });
     });
-});
+
 </script>
 
 
 
 </body>
-
-
 
 

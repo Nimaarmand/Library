@@ -13,5 +13,6 @@ namespace Application.Features.Definitions.Delivery
        
         Task<string> ReservationDelivery(long reservId);
         Task<List<DeliveryDto>> GetAllResrvDelivery();
+        Task<List<DeliveryDto>> GetAllDelivery();
     }
 }

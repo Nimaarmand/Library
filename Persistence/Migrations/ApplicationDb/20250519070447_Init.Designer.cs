@@ -12,7 +12,7 @@ using Persistence.Contexts;
 namespace Persistence.Migrations.ApplicationDb
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250518053740_Init")]
+    [Migration("20250519070447_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -204,21 +204,20 @@ namespace Persistence.Migrations.ApplicationDb
                     b.Property<DateTime>("DeliveryTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<long?>("ReservationId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BookId");
 
                     b.HasIndex("ReservationId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Deliveries", "dbo");
                 });
@@ -297,6 +296,9 @@ namespace Persistence.Migrations.ApplicationDb
 
                     b.Property<string>("DeleteUserId")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("DeliveriesId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -397,9 +399,17 @@ namespace Persistence.Migrations.ApplicationDb
                         .HasForeignKey("ReservationId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Domain.Entities.Users.ProfileUser", "User")
+                        .WithMany("Deliveries")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Book");
 
                     b.Navigation("Reservation");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Domain.Entities.Reservations.Reservation", b =>
@@ -433,6 +443,11 @@ namespace Persistence.Migrations.ApplicationDb
             modelBuilder.Entity("Domain.Entities.Reservations.Reservation", b =>
                 {
                     b.Navigation("DeliveryStatuses");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Users.ProfileUser", b =>
+                {
+                    b.Navigation("Deliveries");
                 });
 #pragma warning restore 612, 618
         }

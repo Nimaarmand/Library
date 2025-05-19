@@ -17,9 +17,7 @@ namespace Persistence.Contexts
         public DatabaseFacade Database => base.Database;
         public DbSet<ProfileUser> ProfileUser { get; set; }
         public DbSet<Book> Books { get; set; }
-
         public DbSet<BookCategories> BookCategories { get; set; }
-
         public DbSet<Deliverys> Deliveries { get; set; }
         public DbSet<DeliveryStatus> DeliveryStatus { get; set; }
         public DbSet<Reservation> Reservations { get; set; }

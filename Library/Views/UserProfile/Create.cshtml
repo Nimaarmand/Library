@@ -141,11 +141,12 @@
                         icon: 'success',
                         title: 'عملیات موفق',
                         text: 'پروفایل با موفقیت ذخیره شد.',
-                        confirmButtonText: 'باشه'
+                        timer:2000
                     }).then(() => {
-                        window.location.href = '@Url.Action("Index", "UserProfile")';
+                         $("#myForm")[0].reset();
                     });
                 },
+
                 error: function () {
                     Swal.fire({
                         icon: 'error',

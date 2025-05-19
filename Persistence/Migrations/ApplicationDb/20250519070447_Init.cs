@@ -74,6 +74,7 @@ namespace Persistence.Migrations.ApplicationDb
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DeliveriesId = table.Column<long>(type: "bigint", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NationalCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -162,8 +163,7 @@ namespace Persistence.Migrations.ApplicationDb
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     DeliveryTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ReservationId = table.Column<long>(type: "bigint", nullable: true),
                     BookId = table.Column<long>(type: "bigint", nullable: false)
@@ -176,6 +176,13 @@ namespace Persistence.Migrations.ApplicationDb
                         column: x => x.BookId,
                         principalSchema: "dbo",
                         principalTable: "Books",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Deliveries_ProfileUser_UserId",
+                        column: x => x.UserId,
+                        principalSchema: "dbo",
+                        principalTable: "ProfileUser",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -251,6 +258,12 @@ namespace Persistence.Migrations.ApplicationDb
                 column: "ReservationId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Deliveries_UserId",
+                schema: "dbo",
+                table: "Deliveries",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_DeliveryStatus_DeliveryId",
                 schema: "dbo",
                 table: "DeliveryStatus",
@@ -281,15 +294,15 @@ namespace Persistence.Migrations.ApplicationDb
                 schema: "dbo");
 
             migrationBuilder.DropTable(
-                name: "ProfileUser",
-                schema: "dbo");
-
-            migrationBuilder.DropTable(
                 name: "BookCategories",
                 schema: "dbo");
 
             migrationBuilder.DropTable(
                 name: "Deliveries",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
+                name: "ProfileUser",
                 schema: "dbo");
 
             migrationBuilder.DropTable(

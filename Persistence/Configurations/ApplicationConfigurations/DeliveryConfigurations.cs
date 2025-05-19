@@ -9,7 +9,7 @@ namespace Persistence.Configurations.ApplicationConfigurations
         public void Configure(EntityTypeBuilder<Deliverys> builder)
         {
             // فیلتر کردن رکوردهای حذف‌شده
-            builder.HasQueryFilter(m => EF.Property<int>(m, "IsDeleted") == 0);
+            //builder.HasQueryFilter(m => EF.Property<int>(m, "IsDeleted") == 0);
 
             // تنظیم ارتباط کلید خارجی با Reservation
             builder.HasOne(d => d.Reservation)
