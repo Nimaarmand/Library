@@ -76,7 +76,7 @@
 
 
 
-                                    <li>  <a class="dropdown-item text-danger delete-category" data-id="@item.Id" href="#"> <i class="fas fa-trash"></i> حذف </a> </li>
+                                   @*  <li>  <a class="dropdown-item text-danger delete-category" data-id="@item.Id" href="#"> <i class="fas fa-trash"></i> حذف </a> </li> *@
 
 
                                 </ul>
@@ -117,7 +117,7 @@
         });
 
         $(document).ready(function () {
-            // Delete category
+            
             $(".delete-category").click(function (e) {
                 e.preventDefault();
 
@@ -136,7 +136,7 @@
                     if (result.isConfirmed) {
                         $.ajax({
                             type: "POST",
-                            url: "/Category/Delete",
+                            url: "/Account/Delete",
                             data: { id: categoryId },
                             success: function (response) {
                                 if (response.success) {

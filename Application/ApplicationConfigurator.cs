@@ -14,7 +14,7 @@ namespace Application
 
         { 
 
-            // اضافه کردن MediatR
+           
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
             services.AddScoped<IBookService, BookService>();

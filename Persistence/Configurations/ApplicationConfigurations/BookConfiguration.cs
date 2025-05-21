@@ -10,7 +10,7 @@ namespace Persistence.Configurations.ApplicationConfigurations
         {
             //builder.Property(a => a.Pages).HasColumnType("ntext");
 
-            builder.HasQueryFilter(m => EF.Property<int>(m, "IsDeleted") == 0);
+            //builder.HasQueryFilter(m => EF.Property<int>(m, "IsDeleted") == 0);
         }
     }
 }

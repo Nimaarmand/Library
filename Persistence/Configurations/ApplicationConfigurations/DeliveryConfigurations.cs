@@ -15,7 +15,7 @@ namespace Persistence.Configurations.ApplicationConfigurations
             builder.HasOne(d => d.Reservation)
                    .WithMany()
                    .HasForeignKey(d => d.ReservationId)
-                   .OnDelete(DeleteBehavior.Restrict); // یا .OnDelete(DeleteBehavior.SetNull);
+                   .OnDelete(DeleteBehavior.Restrict); 
         }
     }
 }

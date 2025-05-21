@@ -87,18 +87,18 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function () {
-            // اعتبارسنجی شماره تلفن فقط با regex
+           
             $("#registerForm").on("submit", function (e) {
                 e.preventDefault();
 
-                // پاک کردن خطاهای قبلی
+               
                 $(".form-control").removeClass("is-invalid");
                 $(".invalid-feedback").text("");
 
                 const phoneNumber = $("#PhoneNumber").val();
                 let hasError = false;
 
-                // بررسی صحت شماره تلفن
+               
                 if (!phoneNumber.match(/^(\+98|0)?9\d{9}$/)) {
                     $("#PhoneNumber").addClass("is-invalid");
                     $("#phoneError").text("شماره تلفن معتبر نیست");
@@ -109,7 +109,7 @@
                     $.ajax({
                         url: '/Account/Edit',
                         method: 'POST',
-                        data: $("#registerForm").serialize(), // فقط شماره تلفن ارسال می‌شود
+                        data: $("#registerForm").serialize(), 
                         success: function (response) {
                             if (response.success) {
                                 Swal.fire({
@@ -118,7 +118,7 @@
                                     text: response.message,
                                     confirmButtonText: 'باشه'
                                 }).then(() => {
-                                    window.location.href = '/Account/ListUser'; // بازگشت به لیست کاربران
+                                    window.location.href = '/Account/ListUser'; 
                                 });
                             } else {
                                 Swal.fire({

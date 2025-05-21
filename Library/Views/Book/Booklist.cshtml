@@ -146,7 +146,7 @@
                                         response.message,
                                         'success'
                                     ).then(() => {
-                                        location.reload(); // Refresh the page or just remove row
+                                        location.reload(); 
                                     });
                                 } else {
                                     Swal.fire(
@@ -192,7 +192,7 @@
        $(".btn-edit").click(function (e) {
         e.preventDefault();
 
-        var bookId = $(this).data("id"); // اطمینان از اینکه ID درست دریافت می‌شود
+        var bookId = $(this).data("id"); 
         if (bookId) {
             window.location.href = "/Book/Edit/" + bookId;
 

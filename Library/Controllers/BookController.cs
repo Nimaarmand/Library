@@ -17,7 +17,7 @@ namespace Library.Controllers
 
         public async Task<IActionResult> Booklist()
         {
-            var listbook = await _bookService.GetAllBooksAsync(); // حتماً await استفاده شود
+            var listbook = await _bookService.GetAllBooksAsync(); 
             return View(listbook);
         }
 
@@ -126,24 +126,29 @@ namespace Library.Controllers
             }
         }
 
-        // GET: BookController/Delete/5
+      
         public IActionResult Delete(int id)
         {
             return View();
         }
 
-        // POST: BookController/Delete/5
+       
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(int id, IFormCollection collection)
+        public IActionResult Delete(long id)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                _bookService.RemoveAsync(id);
+                return Json(new
+                {
+                    success = true,
+                    message = "عملیات با موفقیت انجام شد!"
+                });
             }
             catch
             {
-                return View();
+                return Json(new { success = false, message = "خطا در انجام عملیات!" });
             }
         }
     }

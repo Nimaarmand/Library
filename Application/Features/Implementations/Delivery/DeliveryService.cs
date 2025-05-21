@@ -58,13 +58,15 @@ namespace Application.Features.Implementations.Delivery
                     deliveryDto.BookName = book.Name;
                     var user = await _Userprofile.GetByIdAsync(deliveryDto.UserId);
                     deliveryDto.UserName = user.FirstName;
-
+                  
 
                     var deliverys = new Deliverys();
                     deliverys.BookId = deliveryDto.BookId;
                     deliverys.UserId = deliveryDto.UserId;
                     deliverys.DeliveryTime = DateTime.Now;
 
+                    await _Context.Set<Deliverys>().AddAsync(deliverys);
+                    await _Context.SaveChangesAsync();
 
                     var deliveryStatus = new DeliveryStatus
                     {
@@ -75,7 +77,7 @@ namespace Application.Features.Implementations.Delivery
                     };
 
                     deliverys.DeliveryStatuses.Add(deliveryStatus);
-                    await _Context.Set<Deliverys>().AddAsync(deliverys);
+                  
                     await _Context.SaveChangesAsync();
 
                     return Messages.Success("تحویل کتاب با موفقیت انجام شد.");
@@ -85,8 +87,7 @@ namespace Application.Features.Implementations.Delivery
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ خطای دیتابیس: {ex.Message}");
-                Console.WriteLine($"📌 جزئیات خطا: {ex.InnerException?.Message}");
+               
                 return Messages.Error("خطای غیرمنتظره‌ای رخ داده است، لطفاً دوباره امتحان کنید.");
             }
         }
@@ -165,26 +166,20 @@ namespace Application.Features.Implementations.Delivery
         {
             try
             {
-                // دریافت لیست تحویل‌هایی که وضعیت تحویل دارند
+               
                 var deliveries = await _Context.Set<Deliverys>()
-                    .Where(d => d.DeliveryStatuses.Any(ds => ds.DeliveryState))
+                    .Include(d => d.DeliveryStatuses) 
+                    .Where(d => d.DeliveryStatuses.Any(ds => ds.DeliveryState)) 
+                    .AsNoTracking() 
                     .ToListAsync();
 
-                // استخراج شناسه‌های کاربران
-                var userIds = deliveries
-                    .Select(d => d.UserId)
-                    .Distinct()
-                    .ToList();
-
               
-                var bookIds = deliveries
-                    .Select(d => d.BookId)
-                    .Distinct()
-                    .ToList();
+                var userIds = deliveries.Select(d => d.UserId).Distinct().ToList();
+                var bookIds = deliveries.Select(d => d.BookId).Distinct().ToList();
 
-              
+               
                 var profileUsers = await _Context.Set<ProfileUser>()
-                    .Where(p => userIds.Contains(p.Id)) 
+                    .Where(p => userIds.Contains(p.Id))
                     .ToDictionaryAsync(p => p.Id, p => p.NationalCode);
 
                
@@ -197,12 +192,12 @@ namespace Application.Features.Implementations.Delivery
                 {
                     Id = d.Id,
                     UserId = d.UserId,
-                    UserName = profileUsers.GetValueOrDefault(d.UserId, "کد ملی یافت نشد"), 
+                    UserName = profileUsers.GetValueOrDefault(d.UserId, "کد ملی یافت نشد"),
                     BookId = d.BookId,
                     BookName = books.GetValueOrDefault(d.BookId, "نام کتاب یافت نشد"),
                     DeliveryTime = d.DeliveryTime,
                     ReservationId = d.ReservationId ?? 0,
-                    DeliveryState = d.DeliveryStatuses.FirstOrDefault()?.DeliveryState ?? false
+                    DeliveryState = d.DeliveryStatuses.FirstOrDefault()?.DeliveryState ?? false 
                 })
                 .Where(d => d.ReservationId == 0) 
                 .ToList();

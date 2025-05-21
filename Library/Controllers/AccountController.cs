@@ -49,7 +49,7 @@ namespace Library.Controllers
                 }
 
                 var response = await _authService.Login(request);
-                return Ok(response); // ارسال داده موفق
+                return Ok(response); 
             }
             catch (BusinessException ex)
             {
@@ -136,10 +136,11 @@ namespace Library.Controllers
       
         [HttpPost]
         
-        public IActionResult Delete(int id, IFormCollection collection)
+        public async Task<IActionResult> Delete(long id)
         {
             try
             {
+               
                 return RedirectToAction(nameof(Index));
             }
             catch
